@@ -4,6 +4,9 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# serena
+.serena/
+
 ### STS ###
 .apt_generated
 .classpath
