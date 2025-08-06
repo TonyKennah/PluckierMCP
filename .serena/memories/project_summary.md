@@ -1,0 +1,1 @@
+This is a Spring Boot application that provides information about horse races and interacts with Google Cloud Storage. It exposes a REST endpoint `/info` to retrieve race information from a JSON file stored in a GCS bucket. It also provides some tool callbacks for retrieving meeting and top-rated horse information.

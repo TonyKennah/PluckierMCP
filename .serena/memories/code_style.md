@@ -1,0 +1,1 @@
+The code follows standard Java conventions. It uses annotations for dependency injection and for defining REST controllers and services. The code is organized into packages based on functionality. It uses `@Tool` annotations from the Spring AI project. It uses `com.google.cloud.storage` for interacting with Google Cloud Storage and `com.google.gson` for JSON parsing.

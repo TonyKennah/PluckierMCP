@@ -1,0 +1,6 @@
+- `src/main/java`: Contains the main application source code.
+  - `uk/co/kennah/mcp/McpServerApplication.java`: The main Spring Boot application class.
+  - `uk/co/kennah/mcp/RacesInfo.java`: A service that provides information about horse races.
+  - `uk/co/kennah/mcp/Something.java`: A REST controller that exposes the `/info` endpoint.
+- `pom.xml`: The Maven project object model file, which defines the project's dependencies and build configuration.
+- `README.md`: A file containing a brief description of the project and instructions on how to build and run it.

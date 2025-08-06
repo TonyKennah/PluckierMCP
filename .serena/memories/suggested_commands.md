@@ -1,0 +1,3 @@
+- Build the application: `./mvnw clean install`
+- Run the application: `./mvnw spring-boot:run`
+- Access the application: `curl http://localhost:8080/info`
