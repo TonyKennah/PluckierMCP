@@ -3,6 +3,7 @@ package uk.co.kennah.mcp;
 import java.nio.charset.StandardCharsets;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +25,7 @@ public class GCSReader {
     @Autowired
     private Storage storage;
 
+    @Cacheable("raceData")
     public JsonElement readFileFromGCSAsJson() {
         try {
             BlobId blobId = BlobId.of(bucket, file);

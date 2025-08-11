@@ -24,15 +24,20 @@ public class RacesInfo {
     @Autowired
     private GCSReader gcsReader;
 
+    private JsonArray getCachedRaceData() {
+        JsonElement jsonElement = gcsReader.readFileFromGCSAsJson();
+        if (jsonElement == null || !jsonElement.isJsonArray()) {
+            // This case will be handled by the calling methods if they receive null.
+            return null;
+        }
+        return jsonElement.getAsJsonArray();
+    }
+
     @Tool(name = "getMeetings", description = "Retrieve all unique meeting place names from the race data.")
     public String getMeetings() {
         try {
-            JsonElement jsonElement = gcsReader.readFileFromGCSAsJson();
-            if (!jsonElement.isJsonArray()) {
-                return "Error: Race data is not a valid JSON array.";
-            }
-
-            JsonArray races = jsonElement.getAsJsonArray();
+            JsonArray races = getCachedRaceData();
+            if (races == null) return "Error: Race data is not in the expected format.";
             Set<String> meetings = new HashSet<>();
             for (JsonElement raceElement : races) {
                 JsonObject raceObject = raceElement.getAsJsonObject();
@@ -53,12 +58,8 @@ public class RacesInfo {
 
     @Tool(name = "getTopRated", description = "Get the top rated horse for a particular race, identified by its time and place. This is the highest single rating from any past race.")
     public String getTopRated(String time, String place) {
-        JsonElement jsonElement = gcsReader.readFileFromGCSAsJson();
-        if (!jsonElement.isJsonArray()) {
-            return "Error: Race data is not a valid JSON array.";
-        }
-
-        JsonArray races = jsonElement.getAsJsonArray();
+        JsonArray races = getCachedRaceData();
+        if (races == null) return "Error: Race data is not in the expected format.";
         for (JsonElement raceElement : races) {
             JsonObject raceObject = raceElement.getAsJsonObject();
             if (raceObject.get("place").getAsString().equalsIgnoreCase(place)
@@ -95,12 +96,8 @@ public class RacesInfo {
 
     @Tool(name = "getBestAverageRated", description = "Get the horse with the best average rating for a particular race, identified by its time and place.")
     public String getBestAverageRated(String time, String place) {
-        JsonElement jsonElement = gcsReader.readFileFromGCSAsJson();
-        if (!jsonElement.isJsonArray()) {
-            return "Error: Race data is not a valid JSON array.";
-        }
-
-        JsonArray races = jsonElement.getAsJsonArray();
+        JsonArray races = getCachedRaceData();
+        if (races == null) return "Error: Race data is not in the expected format.";
         for (JsonElement raceElement : races) {
             JsonObject raceObject = raceElement.getAsJsonObject();
             if (raceObject.get("place").getAsString().equalsIgnoreCase(place)
@@ -147,12 +144,8 @@ public class RacesInfo {
 
     @Tool(name = "getBestMostRecentRated", description = "Get the horse with the highest rating from its most recent race, for a particular race identified by its time and place.")
     public String getBestMostRecentRated(String time, String place) {
-        JsonElement jsonElement = gcsReader.readFileFromGCSAsJson();
-        if (!jsonElement.isJsonArray()) {
-            return "Error: Race data is not a valid JSON array.";
-        }
-
-        JsonArray races = jsonElement.getAsJsonArray();
+        JsonArray races = getCachedRaceData();
+        if (races == null) return "Error: Race data is not in the expected format.";
         for (JsonElement raceElement : races) {
             JsonObject raceObject = raceElement.getAsJsonObject();
             if (raceObject.get("place").getAsString().equalsIgnoreCase(place)
@@ -203,12 +196,8 @@ public class RacesInfo {
 
     @Tool(name = "getAllRunners", description = "Get all the runners for a particular race, identified by its time and place.")
     public String getAllRunners(String time, String place) {
-        JsonElement jsonElement = gcsReader.readFileFromGCSAsJson();
-        if (!jsonElement.isJsonArray()) {
-            return "Error: Race data is not a valid JSON array.";
-        }
-
-        JsonArray races = jsonElement.getAsJsonArray();
+        JsonArray races = getCachedRaceData();
+        if (races == null) return "Error: Race data is not in the expected format.";
         for (JsonElement raceElement : races) {
             JsonObject raceObject = raceElement.getAsJsonObject();
             if (raceObject.get("place").getAsString().equalsIgnoreCase(place)
@@ -231,12 +220,8 @@ public class RacesInfo {
 
     @Tool(name = "getAllTimes", description = "Get all the race times for a given meeting place.")
     public String getAllTimes(String place) {
-        JsonElement jsonElement = gcsReader.readFileFromGCSAsJson();
-        if (!jsonElement.isJsonArray()) {
-            return "Error: Race data is not a valid JSON array.";
-        }
-
-        JsonArray races = jsonElement.getAsJsonArray();
+        JsonArray races = getCachedRaceData();
+        if (races == null) return "Error: Race data is not in the expected format.";
         List<String> raceTimes = new ArrayList<>();
         for (JsonElement raceElement : races) {
             JsonObject raceObject = raceElement.getAsJsonObject();
