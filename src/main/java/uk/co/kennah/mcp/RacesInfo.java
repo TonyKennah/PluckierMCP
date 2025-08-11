@@ -1,5 +1,6 @@
 package uk.co.kennah.mcp;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.Storage;
@@ -11,11 +12,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class RacesInfo {
 
-    private final Storage storage;
-
-    public RacesInfo(Storage storage) {
-        this.storage = storage;
-    }
+    @Autowired
+    private GCSReader gcsReader;
 
     @Tool(name = "getAllMeetings", description = "Retrieve all of the meeting names.")
     public String getMeetings() {
@@ -30,18 +28,9 @@ public class RacesInfo {
     @Tool(name = "readFileFromGCS", description = "Reads a file from a Google Cloud Storage bucket.")
     public String readFileFromGCS(String bucketName, String fileName) {
         try {
-            BlobId blobId = BlobId.of(bucketName, fileName);
-            Blob blob = storage.get(blobId);
-            if (blob == null || !blob.exists()) {
-                return "Error: File not found in bucket '" + bucketName + "': " + fileName;
-            }
-            byte[] content = blob.getContent();
-            return new String(content, StandardCharsets.UTF_8);
+            return gcsReader.readFileFromGCS();
         } catch (StorageException e) {
-            // Consider adding logging here to see the full stack trace
             return "Error reading from GCS: " + e.getMessage();
         }
     }
-
-    
 }

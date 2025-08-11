@@ -1,12 +1,10 @@
 package uk.co.kennah.mcp;
 
-import com.google.cloud.spring.autoconfigure.storage.GcpStorageAutoConfiguration;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
 import java.util.List;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
@@ -28,7 +26,7 @@ public class McpServerApplication {
 
 	@Bean
 	public String applicationDescription() {
-		return "This is a sample application for managing MCP functionalities.";
+		return "An application supplying horse racing information.";
 	}
 
 	@Bean
