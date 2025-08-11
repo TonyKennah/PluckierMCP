@@ -24,12 +24,6 @@ This is a Spring Boot application that provides information about horse races an
 
 The application is configured to read race data from a JSON file located in a Google Cloud Storage bucket.
 
-Currently, these values are hardcoded in `src/main/java/uk/co/kennah/mcp/RacesInfo.java`:
-*   **Bucket Name:** `tony-kennah-mcp`
-*   **File Name:** `races.json`
-
-You will need to create this bucket and upload the corresponding `races.json` file for the application to function correctly.
-
 ## Building the Project
 
 You can build the project using the Maven wrapper:
