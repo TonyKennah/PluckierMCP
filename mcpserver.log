@@ -585,3 +585,182 @@ Caused by: java.lang.Error: Unresolved compilation problem:
 2025-08-11T01:06:45.515+01:00  INFO 25380 --- [mcp-server] [main] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable prompts capabilities, notification: true
 2025-08-11T01:06:45.516+01:00  INFO 25380 --- [mcp-server] [main] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable completions capabilities
 2025-08-11T01:06:45.777+01:00  INFO 25380 --- [mcp-server] [main] u.c.k.mcp.McpServerApplicationTests      : Started McpServerApplicationTests in 6.136 seconds (process running for 8.016)
+2025-08-11T01:43:52.213+01:00  INFO 11768 --- [mcp-server] [main] u.c.k.mcp.McpServerApplicationTests      : Starting McpServerApplicationTests using Java 21.0.8 with PID 11768 (started by tonyk in C:\prj\PluckierMCP)
+2025-08-11T01:43:52.213+01:00  INFO 11768 --- [mcp-server] [main] u.c.k.mcp.McpServerApplicationTests      : No active profile set, falling back to 1 default profile: "default"
+2025-08-11T01:43:54.838+01:00  INFO 11768 --- [mcp-server] [main] c.g.c.s.core.DefaultCredentialsProvider  : Default credentials provider for service account pluckier@appspot.gserviceaccount.com
+2025-08-11T01:43:54.838+01:00  INFO 11768 --- [mcp-server] [main] c.g.c.s.core.DefaultCredentialsProvider  : Scopes in use by default credentials: [https://www.googleapis.com/auth/pubsub, https://www.googleapis.com/auth/spanner.admin, https://www.googleapis.com/auth/spanner.data, https://www.googleapis.com/auth/datastore, https://www.googleapis.com/auth/sqlservice.admin, https://www.googleapis.com/auth/devstorage.read_only, https://www.googleapis.com/auth/devstorage.read_write, https://www.googleapis.com/auth/cloudruntimeconfig, https://www.googleapis.com/auth/trace.append, https://www.googleapis.com/auth/cloud-platform, https://www.googleapis.com/auth/cloud-vision, https://www.googleapis.com/auth/bigquery, https://www.googleapis.com/auth/monitoring.write]
+2025-08-11T01:43:54.935+01:00  INFO 11768 --- [mcp-server] [main] c.g.c.s.a.c.GcpContextAutoConfiguration  : The default project ID is pluckier
+2025-08-11T01:43:55.052+01:00  INFO 11768 --- [mcp-server] [main] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable tools capabilities, notification: true
+2025-08-11T01:43:55.054+01:00  INFO 11768 --- [mcp-server] [main] o.s.a.m.s.a.McpServerAutoConfiguration   : Registered tools: 3
+2025-08-11T01:43:55.055+01:00  INFO 11768 --- [mcp-server] [main] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable resources capabilities, notification: true
+2025-08-11T01:43:55.056+01:00  INFO 11768 --- [mcp-server] [main] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable prompts capabilities, notification: true
+2025-08-11T01:43:55.060+01:00  INFO 11768 --- [mcp-server] [main] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable completions capabilities
+2025-08-11T01:43:55.166+01:00  INFO 11768 --- [mcp-server] [main] u.c.k.mcp.McpServerApplicationTests      : Started McpServerApplicationTests in 3.27 seconds (process running for 4.322)
+2025-08-11T01:44:06.002+01:00  INFO 11476 --- [mcp-server] [restartedMain] uk.co.kennah.mcp.McpServerApplication    : Starting McpServerApplication using Java 21.0.8 with PID 11476 (C:\prj\PluckierMCP\target\classes started by tonyk in C:\prj\PluckierMCP)
+2025-08-11T01:44:06.005+01:00  INFO 11476 --- [mcp-server] [restartedMain] uk.co.kennah.mcp.McpServerApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-08-11T01:44:06.059+01:00  INFO 11476 --- [mcp-server] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-08-11T01:44:06.059+01:00  INFO 11476 --- [mcp-server] [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-08-11T01:44:07.237+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-08-11T01:44:07.258+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-08-11T01:44:07.259+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.43]
+2025-08-11T01:44:07.322+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-08-11T01:44:07.323+01:00  INFO 11476 --- [mcp-server] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1263 ms
+2025-08-11T01:44:07.498+01:00  INFO 11476 --- [mcp-server] [restartedMain] c.g.c.s.a.c.GcpContextAutoConfiguration  : The default project ID is pluckier
+2025-08-11T01:44:07.537+01:00  INFO 11476 --- [mcp-server] [restartedMain] c.g.c.s.core.DefaultCredentialsProvider  : Default credentials provider for service account pluckier@appspot.gserviceaccount.com
+2025-08-11T01:44:07.538+01:00  INFO 11476 --- [mcp-server] [restartedMain] c.g.c.s.core.DefaultCredentialsProvider  : Scopes in use by default credentials: [https://www.googleapis.com/auth/pubsub, https://www.googleapis.com/auth/spanner.admin, https://www.googleapis.com/auth/spanner.data, https://www.googleapis.com/auth/datastore, https://www.googleapis.com/auth/sqlservice.admin, https://www.googleapis.com/auth/devstorage.read_only, https://www.googleapis.com/auth/devstorage.read_write, https://www.googleapis.com/auth/cloudruntimeconfig, https://www.googleapis.com/auth/trace.append, https://www.googleapis.com/auth/cloud-platform, https://www.googleapis.com/auth/cloud-vision, https://www.googleapis.com/auth/bigquery, https://www.googleapis.com/auth/monitoring.write]
+2025-08-11T01:44:08.213+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable tools capabilities, notification: true
+2025-08-11T01:44:08.213+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.a.m.s.a.McpServerAutoConfiguration   : Registered tools: 3
+2025-08-11T01:44:08.213+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable resources capabilities, notification: true
+2025-08-11T01:44:08.213+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable prompts capabilities, notification: true
+2025-08-11T01:44:08.213+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable completions capabilities
+2025-08-11T01:44:08.326+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-08-11T01:44:08.364+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-08-11T01:44:08.375+01:00  INFO 11476 --- [mcp-server] [restartedMain] uk.co.kennah.mcp.McpServerApplication    : Started McpServerApplication in 3.032 seconds (process running for 3.595)
+2025-08-11T01:44:21.902+01:00  INFO 11476 --- [mcp-server] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-08-11T01:44:21.903+01:00  INFO 11476 --- [mcp-server] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-08-11T01:44:21.904+01:00  INFO 11476 --- [mcp-server] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-08-11T01:49:04.824+01:00  INFO 11476 --- [mcp-server] [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 2 class path changes (0 additions, 0 deletions, 2 modifications)
+2025-08-11T01:49:04.828+01:00  INFO 11476 --- [mcp-server] [Thread-5] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-08-11T01:49:04.833+01:00  INFO 11476 --- [mcp-server] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-08-11T01:49:04.942+01:00  INFO 11476 --- [mcp-server] [restartedMain] uk.co.kennah.mcp.McpServerApplication    : Starting McpServerApplication using Java 21.0.8 with PID 11476 (C:\prj\PluckierMCP\target\classes started by tonyk in C:\prj\PluckierMCP)
+2025-08-11T01:49:04.943+01:00  INFO 11476 --- [mcp-server] [restartedMain] uk.co.kennah.mcp.McpServerApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-08-11T01:49:05.162+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-08-11T01:49:05.163+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-08-11T01:49:05.163+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.43]
+2025-08-11T01:49:05.192+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-08-11T01:49:05.192+01:00  INFO 11476 --- [mcp-server] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 248 ms
+2025-08-11T01:49:05.219+01:00  INFO 11476 --- [mcp-server] [restartedMain] c.g.c.s.a.c.GcpContextAutoConfiguration  : The default project ID is pluckier
+2025-08-11T01:49:05.221+01:00  INFO 11476 --- [mcp-server] [restartedMain] c.g.c.s.core.DefaultCredentialsProvider  : Default credentials provider for service account pluckier@appspot.gserviceaccount.com
+2025-08-11T01:49:05.221+01:00  INFO 11476 --- [mcp-server] [restartedMain] c.g.c.s.core.DefaultCredentialsProvider  : Scopes in use by default credentials: [https://www.googleapis.com/auth/pubsub, https://www.googleapis.com/auth/spanner.admin, https://www.googleapis.com/auth/spanner.data, https://www.googleapis.com/auth/datastore, https://www.googleapis.com/auth/sqlservice.admin, https://www.googleapis.com/auth/devstorage.read_only, https://www.googleapis.com/auth/devstorage.read_write, https://www.googleapis.com/auth/cloudruntimeconfig, https://www.googleapis.com/auth/trace.append, https://www.googleapis.com/auth/cloud-platform, https://www.googleapis.com/auth/cloud-vision, https://www.googleapis.com/auth/bigquery, https://www.googleapis.com/auth/monitoring.write]
+2025-08-11T01:49:05.266+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable tools capabilities, notification: true
+2025-08-11T01:49:05.267+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.a.m.s.a.McpServerAutoConfiguration   : Registered tools: 3
+2025-08-11T01:49:05.267+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable resources capabilities, notification: true
+2025-08-11T01:49:05.269+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable prompts capabilities, notification: true
+2025-08-11T01:49:05.269+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable completions capabilities
+2025-08-11T01:49:05.279+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-08-11T01:49:05.289+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-08-11T01:49:05.293+01:00  INFO 11476 --- [mcp-server] [restartedMain] uk.co.kennah.mcp.McpServerApplication    : Started McpServerApplication in 0.379 seconds (process running for 300.512)
+2025-08-11T01:49:05.294+01:00  INFO 11476 --- [mcp-server] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-08-11T01:52:25.282+01:00  INFO 11476 --- [mcp-server] [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2025-08-11T01:52:25.284+01:00  INFO 11476 --- [mcp-server] [Thread-7] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-08-11T01:52:25.289+01:00  INFO 11476 --- [mcp-server] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-08-11T01:52:25.360+01:00  INFO 11476 --- [mcp-server] [restartedMain] uk.co.kennah.mcp.McpServerApplication    : Starting McpServerApplication using Java 21.0.8 with PID 11476 (C:\prj\PluckierMCP\target\classes started by tonyk in C:\prj\PluckierMCP)
+2025-08-11T01:52:25.361+01:00  INFO 11476 --- [mcp-server] [restartedMain] uk.co.kennah.mcp.McpServerApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-08-11T01:52:25.538+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-08-11T01:52:25.539+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-08-11T01:52:25.539+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.43]
+2025-08-11T01:52:25.558+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-08-11T01:52:25.559+01:00  INFO 11476 --- [mcp-server] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 196 ms
+2025-08-11T01:52:25.584+01:00  INFO 11476 --- [mcp-server] [restartedMain] c.g.c.s.a.c.GcpContextAutoConfiguration  : The default project ID is pluckier
+2025-08-11T01:52:25.586+01:00  INFO 11476 --- [mcp-server] [restartedMain] c.g.c.s.core.DefaultCredentialsProvider  : Default credentials provider for service account pluckier@appspot.gserviceaccount.com
+2025-08-11T01:52:25.587+01:00  INFO 11476 --- [mcp-server] [restartedMain] c.g.c.s.core.DefaultCredentialsProvider  : Scopes in use by default credentials: [https://www.googleapis.com/auth/pubsub, https://www.googleapis.com/auth/spanner.admin, https://www.googleapis.com/auth/spanner.data, https://www.googleapis.com/auth/datastore, https://www.googleapis.com/auth/sqlservice.admin, https://www.googleapis.com/auth/devstorage.read_only, https://www.googleapis.com/auth/devstorage.read_write, https://www.googleapis.com/auth/cloudruntimeconfig, https://www.googleapis.com/auth/trace.append, https://www.googleapis.com/auth/cloud-platform, https://www.googleapis.com/auth/cloud-vision, https://www.googleapis.com/auth/bigquery, https://www.googleapis.com/auth/monitoring.write]
+2025-08-11T01:52:25.598+01:00  WARN 11476 --- [mcp-server] [restartedMain] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'toolCallbacks' defined in uk.co.kennah.mcp.McpServerApplication: Failed to instantiate [java.util.List]: Factory method 'toolCallbacks' threw exception with message: Multiple tools with the same name (getTopRated) found in sources: uk.co.kennah.mcp.RacesInfo
+2025-08-11T01:52:25.599+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2025-08-11T01:52:25.603+01:00  INFO 11476 --- [mcp-server] [restartedMain] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-08-11T01:52:25.628+01:00 ERROR 11476 --- [mcp-server] [restartedMain] o.s.boot.SpringApplication               : Application run failed
+
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'toolCallbacks' defined in uk.co.kennah.mcp.McpServerApplication: Failed to instantiate [java.util.List]: Factory method 'toolCallbacks' threw exception with message: Multiple tools with the same name (getTopRated) found in sources: uk.co.kennah.mcp.RacesInfo
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:657) ~[spring-beans-6.2.9.jar:6.2.9]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:645) ~[spring-beans-6.2.9.jar:6.2.9]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1375) ~[spring-beans-6.2.9.jar:6.2.9]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1205) ~[spring-beans-6.2.9.jar:6.2.9]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569) ~[spring-beans-6.2.9.jar:6.2.9]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.9.jar:6.2.9]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.9.jar:6.2.9]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373) ~[spring-beans-6.2.9.jar:6.2.9]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.9.jar:6.2.9]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-6.2.9.jar:6.2.9]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1222) ~[spring-beans-6.2.9.jar:6.2.9]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1188) ~[spring-beans-6.2.9.jar:6.2.9]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1123) ~[spring-beans-6.2.9.jar:6.2.9]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:987) ~[spring-context-6.2.9.jar:6.2.9]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627) ~[spring-context-6.2.9.jar:6.2.9]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146) ~[spring-boot-3.5.4.jar:3.5.4]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752) ~[spring-boot-3.5.4.jar:3.5.4]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) ~[spring-boot-3.5.4.jar:3.5.4]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) ~[spring-boot-3.5.4.jar:3.5.4]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361) ~[spring-boot-3.5.4.jar:3.5.4]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350) ~[spring-boot-3.5.4.jar:3.5.4]
+	at uk.co.kennah.mcp.McpServerApplication.main(McpServerApplication.java:14) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:50) ~[spring-boot-devtools-3.5.4.jar:3.5.4]
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [java.util.List]: Factory method 'toolCallbacks' threw exception with message: Multiple tools with the same name (getTopRated) found in sources: uk.co.kennah.mcp.RacesInfo
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.lambda$instantiate$0(SimpleInstantiationStrategy.java:200) ~[spring-beans-6.2.9.jar:6.2.9]
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiateWithFactoryMethod(SimpleInstantiationStrategy.java:89) ~[spring-beans-6.2.9.jar:6.2.9]
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:169) ~[spring-beans-6.2.9.jar:6.2.9]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:653) ~[spring-beans-6.2.9.jar:6.2.9]
+	... 24 common frames omitted
+Caused by: java.lang.IllegalStateException: Multiple tools with the same name (getTopRated) found in sources: uk.co.kennah.mcp.RacesInfo
+	at org.springframework.ai.tool.method.MethodToolCallbackProvider.validateToolCallbacks(MethodToolCallbackProvider.java:121) ~[spring-ai-model-1.0.0.jar:1.0.0]
+	at org.springframework.ai.tool.method.MethodToolCallbackProvider.getToolCallbacks(MethodToolCallbackProvider.java:100) ~[spring-ai-model-1.0.0.jar:1.0.0]
+	at org.springframework.ai.tool.method.MethodToolCallbackProvider.<init>(MethodToolCallbackProvider.java:61) ~[spring-ai-model-1.0.0.jar:1.0.0]
+	at org.springframework.ai.tool.method.MethodToolCallbackProvider$Builder.build(MethodToolCallbackProvider.java:145) ~[spring-ai-model-1.0.0.jar:1.0.0]
+	at org.springframework.ai.support.ToolCallbacks.from(ToolCallbacks.java:34) ~[spring-ai-model-1.0.0.jar:1.0.0]
+	at uk.co.kennah.mcp.McpServerApplication.toolCallbacks(McpServerApplication.java:34) ~[classes/:na]
+	at uk.co.kennah.mcp.McpServerApplication$$SpringCGLIB$$0.CGLIB$toolCallbacks$2(<generated>) ~[classes/:na]
+	at uk.co.kennah.mcp.McpServerApplication$$SpringCGLIB$$FastClass$$1.invoke(<generated>) ~[classes/:na]
+	at org.springframework.cglib.proxy.MethodProxy.invokeSuper(MethodProxy.java:258) ~[spring-core-6.2.9.jar:6.2.9]
+	at org.springframework.context.annotation.ConfigurationClassEnhancer$BeanMethodInterceptor.intercept(ConfigurationClassEnhancer.java:400) ~[spring-context-6.2.9.jar:6.2.9]
+	at uk.co.kennah.mcp.McpServerApplication$$SpringCGLIB$$0.toolCallbacks(<generated>) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.lambda$instantiate$0(SimpleInstantiationStrategy.java:172) ~[spring-beans-6.2.9.jar:6.2.9]
+	... 27 common frames omitted
+
+2025-08-11T01:54:26.244+01:00  INFO 11476 --- [mcp-server] [restartedMain] uk.co.kennah.mcp.McpServerApplication    : Starting McpServerApplication using Java 21.0.8 with PID 11476 (C:\prj\PluckierMCP\target\classes started by tonyk in C:\prj\PluckierMCP)
+2025-08-11T01:54:26.245+01:00  INFO 11476 --- [mcp-server] [restartedMain] uk.co.kennah.mcp.McpServerApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-08-11T01:54:26.482+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-08-11T01:54:26.485+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-08-11T01:54:26.486+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.43]
+2025-08-11T01:54:26.511+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.a.c.c.C.[Tomcat-1].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2025-08-11T01:54:26.511+01:00  INFO 11476 --- [mcp-server] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 263 ms
+2025-08-11T01:54:26.539+01:00  INFO 11476 --- [mcp-server] [restartedMain] c.g.c.s.a.c.GcpContextAutoConfiguration  : The default project ID is pluckier
+2025-08-11T01:54:26.540+01:00  INFO 11476 --- [mcp-server] [restartedMain] c.g.c.s.core.DefaultCredentialsProvider  : Default credentials provider for service account pluckier@appspot.gserviceaccount.com
+2025-08-11T01:54:26.540+01:00  INFO 11476 --- [mcp-server] [restartedMain] c.g.c.s.core.DefaultCredentialsProvider  : Scopes in use by default credentials: [https://www.googleapis.com/auth/pubsub, https://www.googleapis.com/auth/spanner.admin, https://www.googleapis.com/auth/spanner.data, https://www.googleapis.com/auth/datastore, https://www.googleapis.com/auth/sqlservice.admin, https://www.googleapis.com/auth/devstorage.read_only, https://www.googleapis.com/auth/devstorage.read_write, https://www.googleapis.com/auth/cloudruntimeconfig, https://www.googleapis.com/auth/trace.append, https://www.googleapis.com/auth/cloud-platform, https://www.googleapis.com/auth/cloud-vision, https://www.googleapis.com/auth/bigquery, https://www.googleapis.com/auth/monitoring.write]
+2025-08-11T01:54:26.610+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable tools capabilities, notification: true
+2025-08-11T01:54:26.610+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.a.m.s.a.McpServerAutoConfiguration   : Registered tools: 7
+2025-08-11T01:54:26.610+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable resources capabilities, notification: true
+2025-08-11T01:54:26.611+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable prompts capabilities, notification: true
+2025-08-11T01:54:26.611+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable completions capabilities
+2025-08-11T01:54:26.624+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-08-11T01:54:26.630+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-08-11T01:54:26.634+01:00  INFO 11476 --- [mcp-server] [restartedMain] uk.co.kennah.mcp.McpServerApplication    : Started McpServerApplication in 0.426 seconds (process running for 621.853)
+2025-08-11T01:54:26.635+01:00  INFO 11476 --- [mcp-server] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-08-11T01:58:59.315+01:00  INFO 11476 --- [mcp-server] [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2025-08-11T01:58:59.316+01:00  INFO 11476 --- [mcp-server] [Thread-11] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-08-11T01:58:59.319+01:00  INFO 11476 --- [mcp-server] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-08-11T01:58:59.385+01:00  INFO 11476 --- [mcp-server] [restartedMain] uk.co.kennah.mcp.McpServerApplication    : Starting McpServerApplication using Java 21.0.8 with PID 11476 (C:\prj\PluckierMCP\target\classes started by tonyk in C:\prj\PluckierMCP)
+2025-08-11T01:58:59.385+01:00  INFO 11476 --- [mcp-server] [restartedMain] uk.co.kennah.mcp.McpServerApplication    : No active profile set, falling back to 1 default profile: "default"
+2025-08-11T01:58:59.553+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-08-11T01:58:59.554+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-08-11T01:58:59.555+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.43]
+2025-08-11T01:58:59.577+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.a.c.c.C.[Tomcat-1].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2025-08-11T01:58:59.578+01:00  INFO 11476 --- [mcp-server] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 191 ms
+2025-08-11T01:58:59.646+01:00  INFO 11476 --- [mcp-server] [restartedMain] c.g.c.s.a.c.GcpContextAutoConfiguration  : The default project ID is pluckier
+2025-08-11T01:58:59.667+01:00  INFO 11476 --- [mcp-server] [restartedMain] c.g.c.s.core.DefaultCredentialsProvider  : Default credentials provider for service account pluckier@appspot.gserviceaccount.com
+2025-08-11T01:58:59.668+01:00  INFO 11476 --- [mcp-server] [restartedMain] c.g.c.s.core.DefaultCredentialsProvider  : Scopes in use by default credentials: [https://www.googleapis.com/auth/pubsub, https://www.googleapis.com/auth/spanner.admin, https://www.googleapis.com/auth/spanner.data, https://www.googleapis.com/auth/datastore, https://www.googleapis.com/auth/sqlservice.admin, https://www.googleapis.com/auth/devstorage.read_only, https://www.googleapis.com/auth/devstorage.read_write, https://www.googleapis.com/auth/cloudruntimeconfig, https://www.googleapis.com/auth/trace.append, https://www.googleapis.com/auth/cloud-platform, https://www.googleapis.com/auth/cloud-vision, https://www.googleapis.com/auth/bigquery, https://www.googleapis.com/auth/monitoring.write]
+2025-08-11T01:58:59.721+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable tools capabilities, notification: true
+2025-08-11T01:58:59.722+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.a.m.s.a.McpServerAutoConfiguration   : Registered tools: 7
+2025-08-11T01:58:59.722+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable resources capabilities, notification: true
+2025-08-11T01:58:59.723+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable prompts capabilities, notification: true
+2025-08-11T01:58:59.723+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable completions capabilities
+2025-08-11T01:58:59.732+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-08-11T01:58:59.738+01:00  INFO 11476 --- [mcp-server] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-08-11T01:58:59.741+01:00  INFO 11476 --- [mcp-server] [restartedMain] uk.co.kennah.mcp.McpServerApplication    : Started McpServerApplication in 0.376 seconds (process running for 894.961)
+2025-08-11T01:58:59.742+01:00  INFO 11476 --- [mcp-server] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2025-08-11T01:59:07.909+01:00  INFO 11476 --- [mcp-server] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-08-11T01:59:07.913+01:00  INFO 11476 --- [mcp-server] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-08-11T01:59:23.787+01:00  INFO 32856 --- [mcp-server] [main] u.c.k.mcp.McpServerApplicationTests      : Starting McpServerApplicationTests using Java 21.0.8 with PID 32856 (started by tonyk in C:\prj\PluckierMCP)
+2025-08-11T01:59:23.792+01:00  INFO 32856 --- [mcp-server] [main] u.c.k.mcp.McpServerApplicationTests      : No active profile set, falling back to 1 default profile: "default"
+2025-08-11T01:59:28.901+01:00  INFO 32856 --- [mcp-server] [main] c.g.c.s.core.DefaultCredentialsProvider  : Default credentials provider for service account pluckier@appspot.gserviceaccount.com
+2025-08-11T01:59:28.903+01:00  INFO 32856 --- [mcp-server] [main] c.g.c.s.core.DefaultCredentialsProvider  : Scopes in use by default credentials: [https://www.googleapis.com/auth/pubsub, https://www.googleapis.com/auth/spanner.admin, https://www.googleapis.com/auth/spanner.data, https://www.googleapis.com/auth/datastore, https://www.googleapis.com/auth/sqlservice.admin, https://www.googleapis.com/auth/devstorage.read_only, https://www.googleapis.com/auth/devstorage.read_write, https://www.googleapis.com/auth/cloudruntimeconfig, https://www.googleapis.com/auth/trace.append, https://www.googleapis.com/auth/cloud-platform, https://www.googleapis.com/auth/cloud-vision, https://www.googleapis.com/auth/bigquery, https://www.googleapis.com/auth/monitoring.write]
+2025-08-11T01:59:29.064+01:00  INFO 32856 --- [mcp-server] [main] c.g.c.s.a.c.GcpContextAutoConfiguration  : The default project ID is pluckier
+2025-08-11T01:59:29.264+01:00  INFO 32856 --- [mcp-server] [main] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable tools capabilities, notification: true
+2025-08-11T01:59:29.268+01:00  INFO 32856 --- [mcp-server] [main] o.s.a.m.s.a.McpServerAutoConfiguration   : Registered tools: 7
+2025-08-11T01:59:29.269+01:00  INFO 32856 --- [mcp-server] [main] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable resources capabilities, notification: true
+2025-08-11T01:59:29.271+01:00  INFO 32856 --- [mcp-server] [main] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable prompts capabilities, notification: true
+2025-08-11T01:59:29.272+01:00  INFO 32856 --- [mcp-server] [main] o.s.a.m.s.a.McpServerAutoConfiguration   : Enable completions capabilities
+2025-08-11T01:59:29.503+01:00  INFO 32856 --- [mcp-server] [main] u.c.k.mcp.McpServerApplicationTests      : Started McpServerApplicationTests in 6.458 seconds (process running for 8.198)

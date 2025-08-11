@@ -46,19 +46,78 @@ The server will start on `http://localhost:8080`.
 
 ### REST API
 
-The application provides a simple REST endpoint to get all race information.
+The application provides several REST endpoints to test the data retrieval logic that is exposed to the AI agent.
 
 *   **GET /info**
 
-    Retrieves the entire content of the `races.json` file.
+    Retrieves the entire content of the raw `sample_races.json` file.
 
     **Example using cURL:**
     ```sh
     curl http://localhost:8080/info
     ```
 
+*   **GET /meetings**
+
+    Retrieves all unique meeting place names.
+
+    **Example using cURL:**
+    ```sh
+    curl http://localhost:8080/meetings
+    ```
+
+*   **GET /all-times?place={place}**
+
+    Retrieves all race times for a given meeting place.
+
+    **Example using cURL:**
+    ```sh
+    curl "http://localhost:8080/all-times?place=Ascot"
+    ```
+
+*   **GET /all-runners?time={time}&place={place}**
+
+    Retrieves all runners for a specific race.
+
+    **Example using cURL:**
+    ```sh
+    curl "http://localhost:8080/all-runners?time=13:30&place=Ascot"
+    ```
+
+*   **GET /top-rated?time={time}&place={place}**
+
+    Retrieves the horse with the highest single rating from any past race for a specific race.
+
+    **Example using cURL:**
+    ```sh
+    curl "http://localhost:8080/top-rated?time=14:05&place=Ascot"
+    ```
+
+*   **GET /best-average-rated?time={time}&place={place}**
+
+    Retrieves the horse with the best average rating for a specific race.
+
+    **Example using cURL:**
+    ```sh
+    curl "http://localhost:8080/best-average-rated?time=13:30&place=Ascot"
+    ```
+
+*   **GET /best-most-recent-rated?time={time}&place={place}**
+
+    Retrieves the horse with the highest rating from its most recent race.
+
+    **Example using cURL:**
+    ```sh
+    curl "http://localhost:8080/best-most-recent-rated?time=13:30&place=Ascot"
+    ```
+
 ### Spring AI Tools
 
 The `RacesInfo` class is annotated with `@Tool` and provides functions that can be used by a Spring AI-powered agent:
-*   `getMeetings(String date)`: Retrieves race meetings for a given date.
-*   `getTopRated(String meeting)`: Retrieves the top-rated horse for a given meeting.
+*   `getMeetings()`: Retrieves all unique meeting place names from the race data.
+*   `getTopRated(String time, String place)`: Get the top rated horse for a particular race, identified by its time and place. This is the highest single rating from any past race.
+*   `getBestAverageRated(String time, String place)`: Get the horse with the best average rating for a particular race, identified by its time and place.
+*   `getBestMostRecentRated(String time, String place)`: Get the horse with the highest rating from its most recent race, for a particular race identified by its time and place.
+*   `getAllRunners(String time, String place)`: Get all the runners for a particular race, identified by its time and place.
+*   `getAllTimes(String place)`: Get all the race times for a given meeting place.
+*   `getRawRaceData()`: Reads the raw race data file from the configured Google Cloud Storage bucket.

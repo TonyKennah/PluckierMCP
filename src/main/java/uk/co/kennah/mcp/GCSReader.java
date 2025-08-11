@@ -1,11 +1,9 @@
 package uk.co.kennah.mcp;
 
-import java.beans.JavaBean;
 import java.nio.charset.StandardCharsets;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import com.google.cloud.storage.Blob;
@@ -24,32 +22,21 @@ public class GCSReader {
     private String file;
 
     @Autowired
-    private Environment env;
-
-    @Autowired
     private Storage storage;
 
-    public String readFileFromGCS() {
+    public JsonElement readFileFromGCSAsJson() {
         try {
-            System.out.println(bucket);
-            System.out.println(file);
-            System.out.println(env.getProperty("gcs.bucket.name"));
-            System.out.println(env.getProperty("gcs.file.name"));
-
-            BlobId blobId = BlobId.of(env.getProperty("gcs.bucket.name"), env.getProperty("gcs.file.name"));
+            BlobId blobId = BlobId.of(bucket, file);
             Blob blob = storage.get(blobId);
             if (blob == null || !blob.exists()) {
-                return "Error: File not found in bucket ";
+                // Or throw a specific exception
+                return JsonParser.parseString("{\"error\": \"File not found in bucket '" + bucket + "'\"}");
             }
             byte[] content = blob.getContent();
-
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            JsonElement je = JsonParser.parseString(new String(content, StandardCharsets.UTF_8));
-            String prettyJsonString = gson.toJson(je);
-            return prettyJsonString;
+            return JsonParser.parseString(new String(content, StandardCharsets.UTF_8));
         } catch (StorageException e) {
             // Consider adding logging here to see the full stack trace
-            return "Error reading from GCS: " + e.getMessage();
+            return JsonParser.parseString("{\"error\": \"Error reading from GCS: " + e.getMessage() + "\"}");
         }
     }
 
