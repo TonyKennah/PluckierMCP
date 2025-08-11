@@ -33,6 +33,18 @@ public class RacesInfo {
         return jsonElement.getAsJsonArray();
     }
 
+    private Optional<JsonObject> findRace(String time, String place) {
+        JsonArray races = getCachedRaceData();
+        if (races == null) {
+            return Optional.empty();
+        }
+        return StreamSupport.stream(races.spliterator(), false)
+                .map(JsonElement::getAsJsonObject)
+                .filter(race -> race.get("place").getAsString().equalsIgnoreCase(place)
+                        && race.get("time").getAsString().equals(time))
+                .findFirst();
+    }
+
     @Tool(name = "getMeetings", description = "Retrieve all unique meeting place names from the race data.")
     public String getMeetings() {
         try {
@@ -56,17 +68,10 @@ public class RacesInfo {
 
     @Tool(name = "getTopRated", description = "Get the top rated horse for a particular race, identified by its time and place. This is the highest single rating from any past race.")
     public String getTopRated(String time, String place) {
-        JsonArray races = getCachedRaceData();
-        if (races == null) return "Error: Race data is not in the expected format.";
-
         // Local record for temporary data holding
         record HorseRating(String name, double rating) {}
 
-        return StreamSupport.stream(races.spliterator(), false)
-                .map(JsonElement::getAsJsonObject)
-                .filter(race -> race.get("place").getAsString().equalsIgnoreCase(place)
-                        && race.get("time").getAsString().equals(time))
-                .findFirst()
+        return findRace(time, place)
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                         .map(JsonElement::getAsJsonObject)
                         .flatMap(horse -> StreamSupport.stream(horse.getAsJsonArray("past_form").spliterator(), false)
@@ -81,17 +86,10 @@ public class RacesInfo {
 
     @Tool(name = "getBestAverageRated", description = "Get the horse with the best average rating for a particular race, identified by its time and place.")
     public String getBestAverageRated(String time, String place) {
-        JsonArray races = getCachedRaceData();
-        if (races == null) return "Error: Race data is not in the expected format.";
-
         // Local record for temporary data holding
         record HorseAverageRating(String name, double average) {}
 
-        return StreamSupport.stream(races.spliterator(), false)
-                .map(JsonElement::getAsJsonObject)
-                .filter(race -> race.get("place").getAsString().equalsIgnoreCase(place)
-                        && race.get("time").getAsString().equals(time))
-                .findFirst()
+        return findRace(time, place)
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                         .map(JsonElement::getAsJsonObject)
                         .map(horse -> {
@@ -112,17 +110,10 @@ public class RacesInfo {
 
     @Tool(name = "getBestMostRecentRated", description = "Get the horse with the highest rating from its most recent race, for a particular race identified by its time and place.")
     public String getBestMostRecentRated(String time, String place) {
-        JsonArray races = getCachedRaceData();
-        if (races == null) return "Error: Race data is not in the expected format.";
-
         // Local record for temporary data holding
         record HorseRecentRating(String name, double rating) {}
 
-        return StreamSupport.stream(races.spliterator(), false)
-                .map(JsonElement::getAsJsonObject)
-                .filter(race -> race.get("place").getAsString().equalsIgnoreCase(place)
-                        && race.get("time").getAsString().equals(time))
-                .findFirst()
+        return findRace(time, place)
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                         .map(JsonElement::getAsJsonObject)
                         .map(horse -> {
@@ -144,13 +135,7 @@ public class RacesInfo {
 
     @Tool(name = "getAllRunners", description = "Get all the runners for a particular race, identified by its time and place.")
     public String getAllRunners(String time, String place) {
-        JsonArray races = getCachedRaceData();
-        if (races == null) return "Error: Race data is not in the expected format.";
-        return StreamSupport.stream(races.spliterator(), false)
-                .map(JsonElement::getAsJsonObject)
-                .filter(race -> race.get("place").getAsString().equalsIgnoreCase(place)
-                        && race.get("time").getAsString().equals(time))
-                .findFirst()
+        return findRace(time, place)
                 .map(race -> {
                     String runners = StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                             .map(horse -> horse.getAsJsonObject().get("name").getAsString())
