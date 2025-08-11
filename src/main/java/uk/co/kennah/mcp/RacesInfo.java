@@ -1,12 +1,12 @@
 package uk.co.kennah.mcp;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
+import java.util.DoubleSummaryStatistics;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import com.google.cloud.storage.StorageException;
@@ -38,19 +38,17 @@ public class RacesInfo {
         try {
             JsonArray races = getCachedRaceData();
             if (races == null) return "Error: Race data is not in the expected format.";
-            Set<String> meetings = new HashSet<>();
-            for (JsonElement raceElement : races) {
-                JsonObject raceObject = raceElement.getAsJsonObject();
-                if (raceObject.has("place")) {
-                    meetings.add(raceObject.get("place").getAsString());
-                }
-            }
+            Set<String> meetings = StreamSupport.stream(races.spliterator(), false)
+                    .map(JsonElement::getAsJsonObject)
+                    .filter(race -> race.has("place"))
+                    .map(race -> race.get("place").getAsString())
+                    .collect(Collectors.toSet());
 
             if (meetings.isEmpty()) {
                 return "No meetings found in the data.";
             }
 
-            return "List of available meetings: " + meetings.stream().collect(Collectors.joining(", "));
+            return "List of available meetings: " + meetings.stream().sorted().collect(Collectors.joining(", "));
         } catch (Exception e) {
             return "An error occurred while fetching meetings: " + e.getMessage();
         }
@@ -60,182 +58,124 @@ public class RacesInfo {
     public String getTopRated(String time, String place) {
         JsonArray races = getCachedRaceData();
         if (races == null) return "Error: Race data is not in the expected format.";
-        for (JsonElement raceElement : races) {
-            JsonObject raceObject = raceElement.getAsJsonObject();
-            if (raceObject.get("place").getAsString().equalsIgnoreCase(place)
-                    && raceObject.get("time").getAsString().equals(time)) {
 
-                JsonArray horses = raceObject.getAsJsonArray("horses");
-                String topRatedHorseName = "N/A";
-                double maxRating = -1.0;
+        // Local record for temporary data holding
+        record HorseRating(String name, double rating) {}
 
-                for (JsonElement horseElement : horses) {
-                    JsonObject horseObject = horseElement.getAsJsonObject();
-                    JsonArray pastForms = horseObject.getAsJsonArray("past_form");
-                    if (pastForms != null) {
-                        for (JsonElement formElement : pastForms) {
-                            JsonObject formObject = formElement.getAsJsonObject();
-                            if (formObject.has("rating")) {
-                                double rating = formObject.get("rating").getAsDouble();
-                                if (rating > maxRating) {
-                                    maxRating = rating;
-                                    topRatedHorseName = horseObject.get("name").getAsString();
-                                }
-                            }
-                        }
-                    }
-                }
-                if (maxRating == -1.0) {
-                    return "No rated horses found for the race at " + place + " at " + time;
-                }
-                return "Top Rated for the " + time + " at " + place + " is: " + topRatedHorseName + " with a rating of " + maxRating;
-            }
-        }
-        return "Could not find the race at " + place + " at " + time;
+        return StreamSupport.stream(races.spliterator(), false)
+                .map(JsonElement::getAsJsonObject)
+                .filter(race -> race.get("place").getAsString().equalsIgnoreCase(place)
+                        && race.get("time").getAsString().equals(time))
+                .findFirst()
+                .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
+                        .map(JsonElement::getAsJsonObject)
+                        .flatMap(horse -> StreamSupport.stream(horse.getAsJsonArray("past_form").spliterator(), false)
+                                .map(JsonElement::getAsJsonObject)
+                                .filter(form -> form.has("rating"))
+                                .map(form -> new HorseRating(horse.get("name").getAsString(), form.get("rating").getAsDouble())))
+                        .max(Comparator.comparingDouble(HorseRating::rating))
+                        .map(top -> "Top Rated for the " + time + " at " + place + " is: " + top.name() + " with a rating of " + top.rating())
+                        .orElse("No rated horses found for the race at " + place + " at " + time))
+                .orElse("Could not find the race at " + place + " at " + time);
     }
 
     @Tool(name = "getBestAverageRated", description = "Get the horse with the best average rating for a particular race, identified by its time and place.")
     public String getBestAverageRated(String time, String place) {
         JsonArray races = getCachedRaceData();
         if (races == null) return "Error: Race data is not in the expected format.";
-        for (JsonElement raceElement : races) {
-            JsonObject raceObject = raceElement.getAsJsonObject();
-            if (raceObject.get("place").getAsString().equalsIgnoreCase(place)
-                    && raceObject.get("time").getAsString().equals(time)) {
 
-                JsonArray horses = raceObject.getAsJsonArray("horses");
-                String bestHorseName = "N/A";
-                double maxAverageRating = -1.0;
+        // Local record for temporary data holding
+        record HorseAverageRating(String name, double average) {}
 
-                for (JsonElement horseElement : horses) {
-                    JsonObject horseObject = horseElement.getAsJsonObject();
-                    JsonArray pastForms = horseObject.getAsJsonArray("past_form");
-                    double totalRating = 0;
-                    int ratingCount = 0;
-
-                    if (pastForms != null) {
-                        for (JsonElement formElement : pastForms) {
-                            JsonObject formObject = formElement.getAsJsonObject();
-                            if (formObject.has("rating")) {
-                                totalRating += formObject.get("rating").getAsDouble();
-                                ratingCount++;
-                            }
-                        }
-                    }
-
-                    if (ratingCount > 0) {
-                        double averageRating = totalRating / ratingCount;
-                        if (averageRating > maxAverageRating) {
-                            maxAverageRating = averageRating;
-                            bestHorseName = horseObject.get("name").getAsString();
-                        }
-                    }
-                }
-
-                if (maxAverageRating == -1.0) {
-                    return "No horses with an average rating found for the race at " + place + " at " + time;
-                }
-                return "Horse with best average rating for the " + time + " at " + place + " is: " + bestHorseName
-                        + " with an average rating of " + String.format("%.2f", maxAverageRating);
-            }
-        }
-        return "Could not find the race at " + place + " at " + time;
+        return StreamSupport.stream(races.spliterator(), false)
+                .map(JsonElement::getAsJsonObject)
+                .filter(race -> race.get("place").getAsString().equalsIgnoreCase(place)
+                        && race.get("time").getAsString().equals(time))
+                .findFirst()
+                .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
+                        .map(JsonElement::getAsJsonObject)
+                        .map(horse -> {
+                            DoubleSummaryStatistics stats = StreamSupport.stream(horse.getAsJsonArray("past_form").spliterator(), false)
+                                    .map(JsonElement::getAsJsonObject)
+                                    .filter(form -> form.has("rating"))
+                                    .mapToDouble(form -> form.get("rating").getAsDouble())
+                                    .summaryStatistics();
+                            return new HorseAverageRating(horse.get("name").getAsString(), stats.getCount() > 0 ? stats.getAverage() : -1);
+                        })
+                        .filter(h -> h.average() >= 0)
+                        .max(Comparator.comparingDouble(HorseAverageRating::average))
+                        .map(top -> "Horse with best average rating for the " + time + " at " + place + " is: " + top.name()
+                                + " with an average rating of " + String.format("%.2f", top.average()))
+                        .orElse("No horses with an average rating found for the race at " + place + " at " + time))
+                .orElse("Could not find the race at " + place + " at " + time);
     }
 
     @Tool(name = "getBestMostRecentRated", description = "Get the horse with the highest rating from its most recent race, for a particular race identified by its time and place.")
     public String getBestMostRecentRated(String time, String place) {
         JsonArray races = getCachedRaceData();
         if (races == null) return "Error: Race data is not in the expected format.";
-        for (JsonElement raceElement : races) {
-            JsonObject raceObject = raceElement.getAsJsonObject();
-            if (raceObject.get("place").getAsString().equalsIgnoreCase(place)
-                    && raceObject.get("time").getAsString().equals(time)) {
 
-                JsonArray horses = raceObject.getAsJsonArray("horses");
-                String bestHorseName = "N/A";
-                double maxRecentRating = -1.0;
+        // Local record for temporary data holding
+        record HorseRecentRating(String name, double rating) {}
 
-                for (JsonElement horseElement : horses) {
-                    JsonObject horseObject = horseElement.getAsJsonObject();
-                    JsonArray pastForms = horseObject.getAsJsonArray("past_form");
-
-                    if (pastForms != null && !pastForms.isEmpty()) {
-                        JsonObject mostRecentForm = null;
-                        LocalDate latestDate = null;
-
-                        for (JsonElement formElement : pastForms) {
-                            JsonObject formObject = formElement.getAsJsonObject();
-                            if (formObject.has("date")) {
-                                LocalDate date = LocalDate.parse(formObject.get("date").getAsString());
-                                if (latestDate == null || date.isAfter(latestDate)) {
-                                    latestDate = date;
-                                    mostRecentForm = formObject;
-                                }
-                            }
-                        }
-
-                        if (mostRecentForm != null && mostRecentForm.has("rating")) {
-                            double rating = mostRecentForm.get("rating").getAsDouble();
-                            if (rating > maxRecentRating) {
-                                maxRecentRating = rating;
-                                bestHorseName = horseObject.get("name").getAsString();
-                            }
-                        }
-                    }
-                }
-
-                if (maxRecentRating == -1.0) {
-                    return "No horses with a recent rating found for the race at " + place + " at " + time;
-                }
-                return "Horse with best most recent rating for the " + time + " at " + place + " is: " + bestHorseName
-                        + " with a rating of " + maxRecentRating;
-            }
-        }
-        return "Could not find the race at " + place + " at " + time;
+        return StreamSupport.stream(races.spliterator(), false)
+                .map(JsonElement::getAsJsonObject)
+                .filter(race -> race.get("place").getAsString().equalsIgnoreCase(place)
+                        && race.get("time").getAsString().equals(time))
+                .findFirst()
+                .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
+                        .map(JsonElement::getAsJsonObject)
+                        .map(horse -> {
+                            Optional<JsonObject> mostRecentForm = StreamSupport.stream(horse.getAsJsonArray("past_form").spliterator(), false)
+                                    .map(JsonElement::getAsJsonObject)
+                                    .filter(form -> form.has("date"))
+                                    .max(Comparator.comparing(form -> LocalDate.parse(form.get("date").getAsString())));
+                            
+                            return mostRecentForm.filter(form -> form.has("rating"))
+                                    .map(form -> new HorseRecentRating(horse.get("name").getAsString(), form.get("rating").getAsDouble()));
+                        })
+                        .flatMap(Optional::stream) // Filter out horses with no recent rated form
+                        .max(Comparator.comparingDouble(HorseRecentRating::rating))
+                        .map(top -> "Horse with best most recent rating for the " + time + " at " + place + " is: " + top.name()
+                                + " with a rating of " + top.rating())
+                        .orElse("No horses with a recent rating found for the race at " + place + " at " + time))
+                .orElse("Could not find the race at " + place + " at " + time);
     }
 
     @Tool(name = "getAllRunners", description = "Get all the runners for a particular race, identified by its time and place.")
     public String getAllRunners(String time, String place) {
         JsonArray races = getCachedRaceData();
         if (races == null) return "Error: Race data is not in the expected format.";
-        for (JsonElement raceElement : races) {
-            JsonObject raceObject = raceElement.getAsJsonObject();
-            if (raceObject.get("place").getAsString().equalsIgnoreCase(place)
-                    && raceObject.get("time").getAsString().equals(time)) {
-
-                JsonArray horses = raceObject.getAsJsonArray("horses");
-                List<String> runnerNames = new ArrayList<>();
-                for (JsonElement horseElement : horses) {
-                    runnerNames.add(horseElement.getAsJsonObject().get("name").getAsString());
-                }
-
-                if (runnerNames.isEmpty()) {
-                    return "No runners found for the race at " + place + " at " + time;
-                }
-                return "Runners for the " + time + " at " + place + ": " + String.join(", ", runnerNames);
-            }
-        }
-        return "Could not find the race at " + place + " at " + time;
+        return StreamSupport.stream(races.spliterator(), false)
+                .map(JsonElement::getAsJsonObject)
+                .filter(race -> race.get("place").getAsString().equalsIgnoreCase(place)
+                        && race.get("time").getAsString().equals(time))
+                .findFirst()
+                .map(race -> {
+                    String runners = StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
+                            .map(horse -> horse.getAsJsonObject().get("name").getAsString())
+                            .collect(Collectors.joining(", "));
+                    return runners.isEmpty() ? "No runners found for the race at " + place + " at " + time
+                            : "Runners for the " + time + " at " + place + ": " + runners;
+                })
+                .orElse("Could not find the race at " + place + " at " + time);
     }
 
     @Tool(name = "getAllTimes", description = "Get all the race times for a given meeting place.")
     public String getAllTimes(String place) {
         JsonArray races = getCachedRaceData();
         if (races == null) return "Error: Race data is not in the expected format.";
-        List<String> raceTimes = new ArrayList<>();
-        for (JsonElement raceElement : races) {
-            JsonObject raceObject = raceElement.getAsJsonObject();
-            if (raceObject.get("place").getAsString().equalsIgnoreCase(place)) {
-                raceTimes.add(raceObject.get("time").getAsString());
-            }
-        }
 
-        if (raceTimes.isEmpty()) {
-            return "No race times found for meeting at " + place;
-        }
+        String times = StreamSupport.stream(races.spliterator(), false)
+                .map(JsonElement::getAsJsonObject)
+                .filter(race -> race.get("place").getAsString().equalsIgnoreCase(place))
+                .map(race -> race.get("time").getAsString())
+                .sorted()
+                .collect(Collectors.joining(", "));
 
-        raceTimes.sort(Comparator.naturalOrder());
-        return "Race times for " + place + ": " + String.join(", ", raceTimes);
+        return times.isEmpty()
+                ? "No race times found for meeting at " + place
+                : "Race times for " + place + ": " + times;
     }
 
     @Tool(name = "getRawRaceData", description = "Reads the raw race data file from the configured Google Cloud Storage bucket.")
