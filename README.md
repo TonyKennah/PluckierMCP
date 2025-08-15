@@ -4,6 +4,8 @@
 
 # MCP Server
 
+![Example](gemini.jpg "Gemini using pluckier")
+
 This is a Spring Boot application that provides information about horse races and interacts with Google Cloud Storage. It uses Spring AI to expose tool functions for an AI agent and exposes a REST endpoint `/info` to retrieve race information from a JSON file stored in a GCS bucket.
 
 ## Technology Stack
