@@ -1,0 +1,15 @@
+spring:
+  ai:
+    mcp:
+      server:
+        name: pluckiermcp
+        version: 1.0.0
+  application:
+    name: mcp
+  main:
+    banner-mode: off
+    web-application-type: none
+
+logging:
+  pattern:
+    console:

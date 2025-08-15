@@ -1,8 +1,10 @@
 package uk.co.kennah.mcp;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.DoubleSummaryStatistics;
+import java.util.IntSummaryStatistics;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -66,21 +68,46 @@ public class RacesInfo {
         }
     }
 
-    @Tool(name = "getTopRated", description = "Get the top rated horse for a particular race, identified by its time and place. This is the highest single rating from any past race.")
-    public String getTopRated(String time, String place) {
+    @Tool(name = "getBestEverRated", description = "Get the best rated horse for a particular race, identified by its time and place. This is the highest single rating from any past race.")
+    public String getBestEverRated(String time, String place) {
         // Local record for temporary data holding
         record HorseRating(String name, double rating) {}
 
         return findRace(time, place)
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                         .map(JsonElement::getAsJsonObject)
-                        .flatMap(horse -> StreamSupport.stream(horse.getAsJsonArray("past_form").spliterator(), false)
+                        .flatMap(horse -> StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
                                 .map(JsonElement::getAsJsonObject)
-                                .filter(form -> form.has("rating"))
-                                .map(form -> new HorseRating(horse.get("name").getAsString(), form.get("rating").getAsDouble())))
+                                .filter(form -> form.has("name"))
+                                .map(form -> new HorseRating(horse.get("name").getAsString(), form.get("name").getAsInt())))
                         .max(Comparator.comparingDouble(HorseRating::rating))
                         .map(top -> "Top Rated for the " + time + " at " + place + " is: " + top.name() + " with a rating of " + top.rating())
                         .orElse("No rated horses found for the race at " + place + " at " + time))
+                .orElse("Could not find the race at " + place + " at " + time);
+    }
+
+    @Tool(name = "getTopRated", description = "Get the horse with the best average rating over last 3 runs for a particular race, identified by its time and place.")
+    public String getTopRated(String time, String place) {
+        // Local record for temporary data holding
+        record HorseAverageRating(String name, double average) {}
+
+        return findRace(time, place)
+                .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
+                        .map(JsonElement::getAsJsonObject)
+                        .map(horse -> {
+                            IntSummaryStatistics stats = StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
+                                    .map(JsonElement::getAsJsonObject)
+                                    .limit(3)
+                                    .filter(form -> form.has("name"))
+                                    .mapToInt(form -> form.get("name").getAsInt())
+                                    .summaryStatistics();
+                            return new HorseAverageRating(horse.get("name").getAsString(), stats.getCount() > 0 ? stats.getAverage() : -1);
+                        })
+                        .filter(h -> h.average() >= 0)
+                        .max(Comparator.comparingDouble(HorseAverageRating::average))
+                        .map(top -> "Horse with best last 3 run average rating for the " + time + " at " + place + " is: " + top.name()
+                                + " with an average rating of " + String.format("%.2f", top.average()))
+                        .orElse("No horses with a recent average rating found for the race at " + place + " at " + time))
                 .orElse("Could not find the race at " + place + " at " + time);
     }
 
@@ -93,10 +120,10 @@ public class RacesInfo {
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                         .map(JsonElement::getAsJsonObject)
                         .map(horse -> {
-                            DoubleSummaryStatistics stats = StreamSupport.stream(horse.getAsJsonArray("past_form").spliterator(), false)
+                            IntSummaryStatistics stats = StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
                                     .map(JsonElement::getAsJsonObject)
-                                    .filter(form -> form.has("rating"))
-                                    .mapToDouble(form -> form.get("rating").getAsDouble())
+                                    .filter(form -> form.has("name"))
+                                    .mapToInt(form -> form.get("name").getAsInt())
                                     .summaryStatistics();
                             return new HorseAverageRating(horse.get("name").getAsString(), stats.getCount() > 0 ? stats.getAverage() : -1);
                         })
@@ -111,22 +138,27 @@ public class RacesInfo {
     @Tool(name = "getBestMostRecentRated", description = "Get the horse with the highest rating from its most recent race, for a particular race identified by its time and place.")
     public String getBestMostRecentRated(String time, String place) {
         // Local record for temporary data holding
-        record HorseRecentRating(String name, double rating) {}
+        record HorseRecentRating(String name, int rating) {}
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
 
         return findRace(time, place)
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                         .map(JsonElement::getAsJsonObject)
+                        .filter(horse -> horse.has("past"))
                         .map(horse -> {
-                            Optional<JsonObject> mostRecentForm = StreamSupport.stream(horse.getAsJsonArray("past_form").spliterator(), false)
+                            Optional<JsonObject> mostRecentForm = StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
                                     .map(JsonElement::getAsJsonObject)
                                     .filter(form -> form.has("date"))
-                                    .max(Comparator.comparing(form -> LocalDate.parse(form.get("date").getAsString())));
+                                    .max(Comparator.comparing(form -> LocalDate.parse(form.get("date").getAsString(), formatter)));
                             
-                            return mostRecentForm.filter(form -> form.has("rating"))
-                                    .map(form -> new HorseRecentRating(horse.get("name").getAsString(), form.get("rating").getAsDouble()));
+                                    System.out.println("-----------------------------" + place + " " + time + " " + mostRecentForm.toString());
+                           
+                                    return mostRecentForm.filter(form -> form.has("name"))
+                                    .map(form -> new HorseRecentRating(horse.get("name").getAsString(), form.get("name").getAsInt()));
                         })
                         .flatMap(Optional::stream) // Filter out horses with no recent rated form
-                        .max(Comparator.comparingDouble(HorseRecentRating::rating))
+                        .max(Comparator.comparingInt(HorseRecentRating::rating))
                         .map(top -> "Horse with best most recent rating for the " + time + " at " + place + " is: " + top.name()
                                 + " with a rating of " + top.rating())
                         .orElse("No horses with a recent rating found for the race at " + place + " at " + time))

@@ -11,12 +11,12 @@ public class ReaderEndpoint {
     @Autowired
     private RacesInfo racesInfo;
 
-    @GetMapping("/info")
+    @GetMapping("/info") //works
     public String getInfo() {
         return racesInfo.getRawRaceData();
     }
 
-    @GetMapping("/meetings")
+    @GetMapping("/meetings") //works
     public String getMeetings() {
         return racesInfo.getMeetings();
     }
@@ -24,6 +24,11 @@ public class ReaderEndpoint {
     @GetMapping("/top-rated")
     public String getTopRated(@RequestParam String time, @RequestParam String place) {
         return racesInfo.getTopRated(time, place);
+    }
+
+    @GetMapping("/best-ever-rated")
+    public String getBestEverRated(@RequestParam String time, @RequestParam String place) {
+        return racesInfo.getBestEverRated(time, place);
     }
 
     @GetMapping("/best-average-rated")
@@ -36,12 +41,12 @@ public class ReaderEndpoint {
         return racesInfo.getBestMostRecentRated(time, place);
     }
 
-    @GetMapping("/all-runners")
+    @GetMapping("/all-runners") //works
     public String getAllRunners(@RequestParam String time, @RequestParam String place) {
         return racesInfo.getAllRunners(time, place);
     }
 
-    @GetMapping("/all-times")
+    @GetMapping("/all-times") //works
     public String getAllTimes(@RequestParam String place) {
         return racesInfo.getAllTimes(place);
     }
