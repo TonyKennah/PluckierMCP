@@ -11,11 +11,6 @@ public class ReaderEndpoint {
     @Autowired
     private RacesInfo racesInfo;
 
-    @GetMapping("/info") //works
-    public String getInfo() {
-        return racesInfo.getRawRaceData();
-    }
-
     @GetMapping("/meetings") //works
     public String getMeetings() {
         return racesInfo.getMeetings();
@@ -24,6 +19,11 @@ public class ReaderEndpoint {
     @GetMapping("/top-rated")
     public String getTopRated(@RequestParam String time, @RequestParam String place) {
         return racesInfo.getTopRated(time, place);
+    }
+
+    @GetMapping("/bottom-rated")
+    public String getBottomRated(@RequestParam String time, @RequestParam String place) {
+        return racesInfo.getBottomRated(time, place);
     }
 
     @GetMapping("/best-ever-rated")
@@ -49,5 +49,30 @@ public class ReaderEndpoint {
     @GetMapping("/all-times") //works
     public String getAllTimes(@RequestParam String place) {
         return racesInfo.getAllTimes(place);
+    }
+
+    @GetMapping("/find-horse-race")
+    public String findHorseRace(@RequestParam String horseName) {
+        return racesInfo.findHorseRace(horseName);
+    }
+
+    @GetMapping("/past-run-dates")
+    public String getPastRunDates(@RequestParam String horseName) {
+        return racesInfo.getPastRunDates(horseName);
+    }
+
+    @GetMapping("/next-race")
+    public String getNextRace() {
+        return racesInfo.getNextRace();
+    }
+
+    @GetMapping("/horse-form")
+    public String getHorseForm(@RequestParam String time, @RequestParam String place, @RequestParam String horseName) {
+        return racesInfo.getHorseForm(time, place, horseName);
+    }
+
+    @GetMapping("/nap-of-the-day")
+    public String getNapOfTheDay() {
+        return racesInfo.getNapOfTheDay();
     }
 }
