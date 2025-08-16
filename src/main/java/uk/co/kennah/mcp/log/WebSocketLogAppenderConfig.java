@@ -2,12 +2,14 @@ package uk.co.kennah.mcp.log;
 
 import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("!test")
 public class WebSocketLogAppenderConfig implements ApplicationListener<ContextRefreshedEvent> {
 
     private final SimpMessagingTemplate messagingTemplate;

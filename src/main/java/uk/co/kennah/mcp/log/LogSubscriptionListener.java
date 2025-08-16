@@ -2,6 +2,7 @@ package uk.co.kennah.mcp.log;
 
 import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.ApplicationListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 @Component
+@Profile("!test")
 public class LogSubscriptionListener implements ApplicationListener<SessionSubscribeEvent> {
 
     private final SimpMessagingTemplate messagingTemplate;
