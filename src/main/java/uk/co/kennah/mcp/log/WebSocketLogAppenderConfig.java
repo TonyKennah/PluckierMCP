@@ -1,31 +1,31 @@
 package uk.co.kennah.mcp.log;
 
 import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Component;
 
-@Component
-public class WebSocketLogAppenderConfig implements ApplicationListener<ContextRefreshedEvent> {
+@Configuration
+@Profile("!test")
+public class WebSocketLogAppenderConfig {
 
     private final SimpMessagingTemplate messagingTemplate;
 
+    @Autowired
     public WebSocketLogAppenderConfig(SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
     }
 
-    @Override
+    @EventListener
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        // Get the root logger from the SLF4J factory, which is backed by Logback
-        Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-
-        // Find our appender by its name (as configured in logback-spring.xml)
-        WebSocketLogAppender appender = (WebSocketLogAppender) root.getAppender("WEBSOCKET");
-
-        // If the appender is found, set the template on the instance.
-        // This is the crucial step that allows the appender to flush its cache.
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        Logger rootLogger = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
+        WebSocketLogAppender appender = (WebSocketLogAppender) rootLogger.getAppender("WEBSOCKET");
         if (appender != null) {
             appender.setMessagingTemplate(messagingTemplate);
         }
