@@ -77,36 +77,7 @@ public class RacesInfo {
     public String getTopRated(String time, String place) {
         logger.info("AI tool call for top rated (last 3 runs) horse in the {} at {}", time, place);
         // Local record for temporary data holding
-        record HorseAverageRating(String name, int average) {}
-
-        return findRace(time, place)
-                .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
-                        .map(JsonElement::getAsJsonObject)
-                        .map(horse -> {
-                            if (!horse.has("past") || !horse.get("past").isJsonArray()) {
-                                return new HorseAverageRating(horse.get("name").getAsString(), -1);
-                            }
-                            IntSummaryStatistics stats = StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
-                                    .map(JsonElement::getAsJsonObject)
-                                    .limit(3)
-                                    .filter(form -> form.has("name"))
-                                    .mapToInt(form -> form.get("name").getAsInt())
-                                    .summaryStatistics();
-                            return new HorseAverageRating(horse.get("name").getAsString(), stats.getCount() > 0 ? (int) stats.getAverage() : -1);
-                        })
-                        .filter(h -> h.average() >= 0)
-                        .max(Comparator.comparingDouble(HorseAverageRating::average))
-                        .map(top -> "Horse with best last 3 run average rating for the " + time + " at " + place + " is: " + top.name()
-                                + " with an average rating of " + String.format("%.2f", top.average()))
-                        .orElse("No horses with a recent average rating found for the race at " + place + " at " + time))
-                .orElse("Could not find the race at " + place + " at " + time);
-    }
-
-    @Tool(name = "get_bottom_rated", description = "Get the horse with the worst average rating over last 3 runs (the fiddle) for a particular race, identified by its time and place.")
-    public String getBottomRated(String time, String place) {
-        logger.info("AI tool call for bottom rated (last 3 runs) horse in the {} at {}", time, place);
-        // Local record for temporary data holding
-        record HorseAverageRating(String name, int average) {}
+        record HorseAverageRating(String name, double average) {}
 
         return findRace(time, place)
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
@@ -121,7 +92,36 @@ public class RacesInfo {
                                     .filter(form -> form.has("name") && form.get("name").isJsonPrimitive())
                                     .mapToInt(form -> form.get("name").getAsInt())
                                     .summaryStatistics();
-                            return new HorseAverageRating(horse.get("name").getAsString(), stats.getCount() > 0 ? (int)stats.getAverage() : -1);
+                            return new HorseAverageRating(horse.get("name").getAsString(), stats.getCount() > 0 ? stats.getAverage() : -1);
+                        })
+                        .filter(h -> h.average() >= 0)
+                        .max(Comparator.comparingDouble(HorseAverageRating::average))
+                        .map(top -> "Horse with best last 3 run average rating for the " + time + " at " + place + " is: " + top.name()
+                                + " with an average rating of " + String.format("%.2f", top.average()))
+                        .orElse("No horses with a recent average rating found for the race at " + place + " at " + time))
+                .orElse("Could not find the race at " + place + " at " + time);
+    }
+
+    @Tool(name = "get_bottom_rated", description = "Get the horse with the worst average rating over last 3 runs (the fiddle) for a particular race, identified by its time and place.")
+    public String getBottomRated(String time, String place) {
+        logger.info("AI tool call for bottom rated (last 3 runs) horse in the {} at {}", time, place);
+        // Local record for temporary data holding
+        record HorseAverageRating(String name, double average) {}
+
+        return findRace(time, place)
+                .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
+                        .map(JsonElement::getAsJsonObject)
+                        .map(horse -> {
+                            if (!horse.has("past") || !horse.get("past").isJsonArray()) {
+                                return new HorseAverageRating(horse.get("name").getAsString(), -1);
+                            }
+                            IntSummaryStatistics stats = StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
+                                    .map(JsonElement::getAsJsonObject)
+                                    .limit(3)
+                                    .filter(form -> form.has("name") && form.get("name").isJsonPrimitive())
+                                    .mapToInt(form -> form.get("name").getAsInt())
+                                    .summaryStatistics();
+                            return new HorseAverageRating(horse.get("name").getAsString(), stats.getCount() > 0 ? stats.getAverage() : -1);
                         })
                         .filter(h -> h.average() >= 0)
                         .min(Comparator.comparingDouble(HorseAverageRating::average))
