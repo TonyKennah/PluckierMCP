@@ -82,6 +82,19 @@ On the server, the WebSocketLogAppender intercepts a log message.
 
 ## Usage
 
+### Live Log Viewer
+
+The application provides a real-time log viewer to monitor server activity. This is particularly useful for observing the AI agent's behavior and the results of the tool function calls as they happen.
+
+1.  Ensure the application is running.
+2.  Open your web browser and navigate to:
+    ```
+    http://localhost:8080/logs.html
+    ```
+3.  The page will automatically connect to the server's WebSocket endpoint and display log messages as they are generated.
+
+---
+
 ### REST API
 
 The application provides several REST endpoints to test the data retrieval logic that is also exposed to the AI agent.
