@@ -52,7 +52,7 @@ public class RacesInfo {
     @Tool(name = "getBestEverRated", description = "Get the best rated horse for a particular race, identified by its time and place. This is the highest single rating from any past race.")
     public String getBestEverRated(String time, String place) {
         // Local record for temporary data holding
-        record HorseRating(String name, double rating) {}
+        record HorseRating(String name, int rating) {}
 
         return findRace(time, place)
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
@@ -61,7 +61,7 @@ public class RacesInfo {
                                 .map(JsonElement::getAsJsonObject)
                                 .filter(form -> form.has("name"))
                                 .map(form -> new HorseRating(horse.get("name").getAsString(), form.get("name").getAsInt())))
-                        .max(Comparator.comparingDouble(HorseRating::rating))
+                        .max(Comparator.comparingInt(HorseRating::rating))
                         .map(top -> "Top Rated for the " + time + " at " + place + " is: " + top.name() + " with a rating of " + top.rating())
                         .orElse("No rated horses found for the race at " + place + " at " + time))
                 .orElse("Could not find the race at " + place + " at " + time);
@@ -70,7 +70,7 @@ public class RacesInfo {
     @Tool(name = "getTopRated", description = "Get the horse with the best average rating over last 3 runs for a particular race, identified by its time and place.")
     public String getTopRated(String time, String place) {
         // Local record for temporary data holding
-        record HorseAverageRating(String name, double average) {}
+        record HorseAverageRating(String name, int average) {}
 
         return findRace(time, place)
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
@@ -82,7 +82,7 @@ public class RacesInfo {
                                     .filter(form -> form.has("name"))
                                     .mapToInt(form -> form.get("name").getAsInt())
                                     .summaryStatistics();
-                            return new HorseAverageRating(horse.get("name").getAsString(), stats.getCount() > 0 ? stats.getAverage() : -1);
+                            return new HorseAverageRating(horse.get("name").getAsString(), stats.getCount() > 0 ? (int)stats.getAverage() : -1);
                         })
                         .filter(h -> h.average() >= 0)
                         .max(Comparator.comparingDouble(HorseAverageRating::average))
@@ -95,7 +95,7 @@ public class RacesInfo {
     @Tool(name = "getBottomRated", description = "Get the horse with the worst average rating over last 3 runs (the fiddle) for a particular race, identified by its time and place.")
     public String getBottomRated(String time, String place) {
         // Local record for temporary data holding
-        record HorseAverageRating(String name, double average) {}
+        record HorseAverageRating(String name, int average) {}
 
         return findRace(time, place)
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
@@ -107,7 +107,7 @@ public class RacesInfo {
                                     .filter(form -> form.has("name"))
                                     .mapToInt(form -> form.get("name").getAsInt())
                                     .summaryStatistics();
-                            return new HorseAverageRating(horse.get("name").getAsString(), stats.getCount() > 0 ? stats.getAverage() : -1);
+                            return new HorseAverageRating(horse.get("name").getAsString(), stats.getCount() > 0 ? (int)stats.getAverage() : -1);
                         })
                         .filter(h -> h.average() >= 0)
                         .min(Comparator.comparingDouble(HorseAverageRating::average))
@@ -382,6 +382,46 @@ public class RacesInfo {
                 .map(nap -> String.format("The nap of the day is %s in the %s at %s, with a recent average rating of %.2f.",
                         nap.horseName(), nap.time(), nap.place(), nap.averageRating()))
                 .orElse("Could not determine a nap of the day from the available data.");
+    }
+
+    @Tool(name = "getHandicapNapOfTheDay", description = "Find the best bet of the day from handicap races only, based on the highest average rating over the last 3 runs.")
+    public String getHandicapNapOfTheDay() {
+        JsonArray races = getCachedRaceData();
+        if (races == null) {
+            return "Error: Race data is not available or in the expected format.";
+        }
+
+        // Local record for holding candidate horses
+        record NapCandidate(String horseName, String time, String place, double averageRating) {}
+
+        Optional<NapCandidate> bestBet = StreamSupport.stream(races.spliterator(), false)
+                .map(JsonElement::getAsJsonObject)
+                .filter(race -> race.has("horses") && race.get("horses").isJsonArray())
+                // Filter for Handicap races only. Detail contains handicap.
+                .filter(race -> race.has("detail") && race.get("detail").getAsString().toLowerCase().contains("handicap"))
+                .flatMap(race -> {
+                    String time = race.get("time").getAsString();
+                    String place = race.get("place").getAsString();
+                    return StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
+                            .map(JsonElement::getAsJsonObject)
+                            .map(horse -> {
+                                IntSummaryStatistics stats = StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
+                                        .map(JsonElement::getAsJsonObject)
+                                        .limit(3)
+                                        .filter(form -> form.has("name"))
+                                        .mapToInt(form -> form.get("name").getAsInt())
+                                        .summaryStatistics();
+                                double average = stats.getCount() > 0 ? stats.getAverage() : -1;
+                                return new NapCandidate(horse.get("name").getAsString(), time, place, average);
+                            });
+                })
+                .filter(candidate -> candidate.averageRating() >= 0)
+                .max(Comparator.comparingDouble(NapCandidate::averageRating));
+
+        return bestBet
+                .map(nap -> String.format("The handicap nap of the day is %s in the %s at %s, with a recent average rating of %.2f.",
+                        nap.horseName(), nap.time(), nap.place(), nap.averageRating()))
+                .orElse("Could not determine a nap of the day from today's handicap races.");
     }
     
 }
