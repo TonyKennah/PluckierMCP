@@ -206,17 +206,5 @@ The application provides several REST endpoints to test the data retrieval logic
 ### Spring AI Tools
 
 The `RacesInfo` class is annotated with `@Tool` and provides functions that can be used by a Spring AI-powered agent:
-*   `getBestEverRated(String time, String place)`: Get the best rated horse for a particular race, identified by its time and place. This is the highest single rating from any past race.
-*   `getTopRated(String time, String place)`: Get the horse with the best average rating over last 3 runs for a particular race, identified by its time and place.
-*   `getBottomRated(String time, String place)`: Get the horse with the worst average rating over last 3 runs (the fiddle) for a particular race, identified by its time and place.
-*   `getBestAverageRated(String time, String place)`: Get the horse with the best average rating for a particular race, identified by its time and place.
-*   `getBestMostRecentRated(String time, String place)`: Get the horse with the highest rating from its most recent race, for a particular race identified by its time and place.
-*   `getAllRunners(String time, String place)`: Get all the runners for a particular race, identified by its time and place.
-*   `getPastRunDates(String horseName)`: Get all the past race dates for a given horse name.
-*   `getAllTimes(String place)`: Get all the race times for a given meeting place.
-*   `getMeetings()`: Retrieve all unique meeting place names from the race data.
-*   `findHorseRace(String horseName)`: Finds the race time and meeting for a given horse name.
-*   `getNextRace()`: Reports the next race time and meeting based on the current system time.
-*   `getHorseForm(String time, String place, String horseName)`: Get the recent form (past race dates and ratings) for a specific horse in a particular race.
-*   `getNapOfTheDay()`: Find the best bet of the day across all races, based on the highest average rating over the last 3 runs.
-*   `getHandicapNapOfTheDay()`: Find the best bet of the day from handicap races only, based on the highest average rating over the last 3 runs.
+*   `get_best_ever_rated(String time, String place)`: Get the best rated horse for a particular race, identified by its time and place. This is the highest single rating from any past race.
+*   `get_top_rated(String time, String place)`: Get the horse with the best average rating over last 3 runs for a particular race, identified

@@ -49,7 +49,7 @@ public class McpServerApplication {
 
 	@Bean
 	public String applicationName() {
-		return "MCP Server Application";
+		return "Pluckier MCP Server Application";
 	}
 
 	@Bean
