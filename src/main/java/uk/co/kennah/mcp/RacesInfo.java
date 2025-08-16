@@ -62,9 +62,10 @@ public class RacesInfo {
         return findRace(time, place)
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                         .map(JsonElement::getAsJsonObject)
+                        .filter(horse -> horse.has("past") && horse.get("past").isJsonArray())
                         .flatMap(horse -> StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
                                 .map(JsonElement::getAsJsonObject)
-                                .filter(form -> form.has("name"))
+                                .filter(form -> form.has("name") && form.get("name").isJsonPrimitive())
                                 .map(form -> new HorseRating(horse.get("name").getAsString(), form.get("name").getAsInt())))
                         .max(Comparator.comparingInt(HorseRating::rating))
                         .map(top -> "Top Rated for the " + time + " at " + place + " is: " + top.name() + " with a rating of " + top.rating())
@@ -82,13 +83,16 @@ public class RacesInfo {
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                         .map(JsonElement::getAsJsonObject)
                         .map(horse -> {
+                            if (!horse.has("past") || !horse.get("past").isJsonArray()) {
+                                return new HorseAverageRating(horse.get("name").getAsString(), -1);
+                            }
                             IntSummaryStatistics stats = StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
                                     .map(JsonElement::getAsJsonObject)
                                     .limit(3)
                                     .filter(form -> form.has("name"))
                                     .mapToInt(form -> form.get("name").getAsInt())
                                     .summaryStatistics();
-                            return new HorseAverageRating(horse.get("name").getAsString(), stats.getCount() > 0 ? (int)stats.getAverage() : -1);
+                            return new HorseAverageRating(horse.get("name").getAsString(), stats.getCount() > 0 ? (int) stats.getAverage() : -1);
                         })
                         .filter(h -> h.average() >= 0)
                         .max(Comparator.comparingDouble(HorseAverageRating::average))
@@ -108,10 +112,13 @@ public class RacesInfo {
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                         .map(JsonElement::getAsJsonObject)
                         .map(horse -> {
+                            if (!horse.has("past") || !horse.get("past").isJsonArray()) {
+                                return new HorseAverageRating(horse.get("name").getAsString(), -1);
+                            }
                             IntSummaryStatistics stats = StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
                                     .map(JsonElement::getAsJsonObject)
                                     .limit(3)
-                                    .filter(form -> form.has("name"))
+                                    .filter(form -> form.has("name") && form.get("name").isJsonPrimitive())
                                     .mapToInt(form -> form.get("name").getAsInt())
                                     .summaryStatistics();
                             return new HorseAverageRating(horse.get("name").getAsString(), stats.getCount() > 0 ? (int)stats.getAverage() : -1);
@@ -134,9 +141,12 @@ public class RacesInfo {
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                         .map(JsonElement::getAsJsonObject)
                         .map(horse -> {
+                            if (!horse.has("past") || !horse.get("past").isJsonArray()) {
+                                return new HorseAverageRating(horse.get("name").getAsString(), -1);
+                            }
                             IntSummaryStatistics stats = StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
                                     .map(JsonElement::getAsJsonObject)
-                                    .filter(form -> form.has("name"))
+                                    .filter(form -> form.has("name") && form.get("name").isJsonPrimitive())
                                     .mapToInt(form -> form.get("name").getAsInt())
                                     .summaryStatistics();
                             return new HorseAverageRating(horse.get("name").getAsString(), stats.getCount() > 0 ? stats.getAverage() : -1);
@@ -160,14 +170,16 @@ public class RacesInfo {
         return findRace(time, place)
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                         .map(JsonElement::getAsJsonObject)
-                        .filter(horse -> horse.has("past"))
                         .map(horse -> {
+                            if (!horse.has("past") || !horse.get("past").isJsonArray()) {
+                                return Optional.<HorseRecentRating>empty();
+                            }
                             Optional<JsonObject> mostRecentForm = StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
                                     .map(JsonElement::getAsJsonObject)
-                                    .filter(form -> form.has("date"))
+                                    .filter(form -> form.has("date") && form.get("date").isJsonPrimitive())
                                     .max(Comparator.comparing(form -> LocalDate.parse(form.get("date").getAsString(), formatter)));
                             
-                                    return mostRecentForm.filter(form -> form.has("name"))
+                                    return mostRecentForm.filter(form -> form.has("name") && form.get("name").isJsonPrimitive())
                                     .map(form -> new HorseRecentRating(horse.get("name").getAsString(), form.get("name").getAsInt()));
                         })
                         .flatMap(Optional::stream) // Filter out horses with no recent rated form
@@ -380,10 +392,13 @@ public class RacesInfo {
                     return StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                             .map(JsonElement::getAsJsonObject)
                             .map(horse -> {
+                                if (!horse.has("past") || !horse.get("past").isJsonArray()) {
+                                    return new NapCandidate(horse.get("name").getAsString(), time, place, -1);
+                                }
                                 IntSummaryStatistics stats = StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
                                         .map(JsonElement::getAsJsonObject)
                                         .limit(3)
-                                        .filter(form -> form.has("name"))
+                                        .filter(form -> form.has("name") && form.get("name").isJsonPrimitive())
                                         .mapToInt(form -> form.get("name").getAsInt())
                                         .summaryStatistics();
                                 double average = stats.getCount() > 0 ? stats.getAverage() : -1;
@@ -421,10 +436,13 @@ public class RacesInfo {
                     return StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                             .map(JsonElement::getAsJsonObject)
                             .map(horse -> {
+                                if (!horse.has("past") || !horse.get("past").isJsonArray()) {
+                                    return new NapCandidate(horse.get("name").getAsString(), time, place, -1);
+                                }
                                 IntSummaryStatistics stats = StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
                                         .map(JsonElement::getAsJsonObject)
                                         .limit(3)
-                                        .filter(form -> form.has("name"))
+                                        .filter(form -> form.has("name") && form.get("name").isJsonPrimitive())
                                         .mapToInt(form -> form.get("name").getAsInt())
                                         .summaryStatistics();
                                 double average = stats.getCount() > 0 ? stats.getAverage() : -1;
