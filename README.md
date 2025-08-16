@@ -67,6 +67,18 @@ Why it's required: This is essential for the live logging feature. If you remove
 - 6. WebSocketLogAppenderConfig.java (The Logging "Glue")
 What it does: This small but vital class solves a tricky startup problem. The logging system starts very early, before the rest of the application (like the WebSocket messaging system) is ready. This class waits for the ContextRefreshedEvent, which signals that the application is fully started. It then safely connects the WebSocketLogAppender to the messaging system, allowing it to start sending logs.
 Why it's required: It prevents a "circular reference" crash on startup. It safely links the logging system to the web system at the correct time.
+- 7. WebSocketConfig.java (The Messaging Pipeline)
+What it does: This class configures the real-time messaging pipeline. It enables Spring's WebSocket message broker and defines the connection endpoint (`/ws`) that clients use. It also sets up the message channels (like `/topic`) that allow the server to broadcast messages to subscribed clients, which is essential for the live logging feature.
+Why it's required: It's the central configuration for all WebSocket communication, making the link between the backend log appender and the frontend log viewer possible.
+
+
+How It All Connects
+- The logs.html frontend connects to the server at the /ws endpoint.
+- The frontend then subscribes to the /topic/logs channel.
+On the server, the WebSocketLogAppender intercepts a log message.
+- The appender sends that message to the /topic/logs destination.
+- The message broker, configured by this class, receives the message and broadcasts it to all clients subscribed to /topic/logs.
+
 
 ## Usage
 
