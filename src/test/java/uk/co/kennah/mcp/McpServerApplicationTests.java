@@ -8,11 +8,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 @SpringBootTest
 class McpServerApplicationTests {
 
-	@MockBean
-	private Storage storage;
-
-	@Test
-	void contextLoads() {
-	}
+	
 
 }

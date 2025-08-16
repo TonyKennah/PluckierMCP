@@ -1,4 +1,4 @@
-package uk.co.kennah.mcp;
+package uk.co.kennah.mcp.gcp;
 
 import java.nio.charset.StandardCharsets;
 

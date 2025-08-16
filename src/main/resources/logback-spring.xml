@@ -13,7 +13,7 @@
     </appender>
 
     <!-- The custom WebSocket appender -->
-    <appender name="WEBSOCKET" class="uk.co.kennah.mcp.WebSocketLogAppender">
+    <appender name="WEBSOCKET" class="uk.co.kennah.mcp.log.WebSocketLogAppender">
         <encoder>
             <!-- This pattern will be sent to the browser -->
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>

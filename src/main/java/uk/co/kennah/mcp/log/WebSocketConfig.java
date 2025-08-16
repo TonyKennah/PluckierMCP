@@ -1,4 +1,4 @@
-package uk.co.kennah.mcp;
+package uk.co.kennah.mcp.log;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

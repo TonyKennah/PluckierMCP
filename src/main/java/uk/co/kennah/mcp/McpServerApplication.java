@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import reactor.core.publisher.Hooks;
+import uk.co.kennah.mcp.aitools.RacesInfo;
 
 @SpringBootApplication
 @EnableCaching
