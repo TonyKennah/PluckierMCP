@@ -51,6 +51,12 @@ public class ReaderEndpoint {
         return racesInfo.getBestMostRecentRated(time, place);
     }
 
+    @GetMapping("/race-win-percentages")
+    public String getRaceWinPercentages(@RequestParam String time, @RequestParam String place) {
+        logger.info("REST request for race win percentages in the {} at {}", time, place);
+        return racesInfo.getRaceWinPercentages(time, place);
+    }
+
     @GetMapping("/all-runners") //works
     public String getAllRunners(@RequestParam String time, @RequestParam String place) {
         logger.info("REST request for all runners in the {} at {}", time, place);

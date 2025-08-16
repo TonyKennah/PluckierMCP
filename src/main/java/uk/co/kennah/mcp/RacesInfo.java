@@ -4,9 +4,11 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
+import java.util.List;
 import java.util.DoubleSummaryStatistics;
 import java.util.IntSummaryStatistics;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -187,6 +189,46 @@ public class RacesInfo {
                         .map(top -> "Horse with best most recent rating for the " + time + " at " + place + " is: " + top.name()
                                 + " with a rating of " + top.rating())
                         .orElse("No horses with a recent rating found for the race at " + place + " at " + time))
+                .orElse("Could not find the race at " + place + " at " + time);
+    }
+
+    @Tool(name = "get_race_win_percentages", description = "Calculates the win percentage for each horse in a race based on their best-ever rating.")
+    public String getRaceWinPercentages(String time, String place) {
+        logger.info("AI tool call for race win percentages in the {} at {}", time, place);
+        // Local record for temporary data holding
+        record HorseRating(String name, int rating) {}
+
+        return findRace(time, place)
+                .map(race -> {
+                    List<HorseRating> horseRatings = StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
+                            .map(JsonElement::getAsJsonObject)
+                            .map(horse -> {
+                                String horseName = horse.get("name").getAsString();
+                                if (!horse.has("past") || !horse.get("past").isJsonArray()) {
+                                    return new HorseRating(horseName, 0);
+                                }
+                                OptionalInt maxRating = StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
+                                        .map(JsonElement::getAsJsonObject)
+                                        .filter(form -> form.has("name") && form.get("name").isJsonPrimitive())
+                                        .mapToInt(form -> form.get("name").getAsInt())
+                                        .max();
+                                return new HorseRating(horseName, maxRating.orElse(0));
+                            })
+                            .collect(Collectors.toList());
+
+                    long totalRatingPool = horseRatings.stream().mapToLong(HorseRating::rating).sum();
+
+                    if (totalRatingPool == 0) {
+                        return "No rating data available to calculate win percentages for the race at " + place + " at " + time;
+                    }
+
+                    String result = horseRatings.stream()
+                            .sorted(Comparator.comparing(HorseRating::rating).reversed())
+                            .map(hr -> String.format("%s: %.2f%%", hr.name(), (hr.rating() / (double) totalRatingPool) * 100))
+                            .collect(Collectors.joining(", "));
+
+                    return "Win percentages for the " + time + " at " + place + ": " + result;
+                })
                 .orElse("Could not find the race at " + place + " at " + time);
     }
 
