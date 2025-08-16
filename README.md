@@ -84,16 +84,7 @@ On the server, the WebSocketLogAppender intercepts a log message.
 
 ### REST API
 
-The application provides several REST endpoints to test the data retrieval logic that is exposed to the AI agent.
-
-*   **GET /info**
-
-    Retrieves the entire content of the raw `sample_races.json` file.
-
-    **Example using cURL:**
-    ```sh
-    curl http://localhost:8080/info
-    ```
+The application provides several REST endpoints to test the data retrieval logic that is also exposed to the AI agent.
 
 *   **GET /meetings**
 
@@ -104,36 +95,36 @@ The application provides several REST endpoints to test the data retrieval logic
     curl http://localhost:8080/meetings
     ```
 
-*   **GET /all-times?place={place}**
-
-    Retrieves all race times for a given meeting place.
-
-    **Example using cURL:**
-    ```sh
-    curl "http://localhost:8080/all-times?place=Ascot"
-    ```
-
-*   **GET /all-runners?time={time}&place={place}**
-
-    Retrieves all runners for a specific race.
-
-    **Example using cURL:**
-    ```sh
-    curl "http://localhost:8080/all-runners?time=13:30&place=Ascot"
-    ```
-
 *   **GET /top-rated?time={time}&place={place}**
 
-    Retrieves the horse with the highest single rating from any past race for a specific race.
+    Retrieves the horse with the best average rating over its last 3 runs for a specific race.
 
     **Example using cURL:**
     ```sh
     curl "http://localhost:8080/top-rated?time=14:05&place=Ascot"
     ```
 
+*   **GET /bottom-rated?time={time}&place={place}**
+
+    Retrieves the horse with the worst average rating over its last 3 runs for a specific race.
+
+    **Example using cURL:**
+    ```sh
+    curl "http://localhost:8080/bottom-rated?time=14:05&place=Ascot"
+    ```
+
+*   **GET /best-ever-rated?time={time}&place={place}**
+
+    Retrieves the horse with the highest single rating from any past race for a specific race.
+
+    **Example using cURL:**
+    ```sh
+    curl "http://localhost:8080/best-ever-rated?time=14:05&place=Ascot"
+    ```
+
 *   **GET /best-average-rated?time={time}&place={place}**
 
-    Retrieves the horse with the best average rating for a specific race.
+    Retrieves the horse with the best average rating across all its past runs for a specific race.
 
     **Example using cURL:**
     ```sh
@@ -149,13 +140,83 @@ The application provides several REST endpoints to test the data retrieval logic
     curl "http://localhost:8080/best-most-recent-rated?time=13:30&place=Ascot"
     ```
 
+*   **GET /all-runners?time={time}&place={place}**
+
+    Retrieves all runners for a specific race.
+
+    **Example using cURL:**
+    ```sh
+    curl "http://localhost:8080/all-runners?time=13:30&place=Ascot"
+    ```
+
+*   **GET /all-times?place={place}**
+
+    Retrieves all race times for a given meeting place.
+
+    **Example using cURL:**
+    ```sh
+    curl "http://localhost:8080/all-times?place=Ascot"
+    ```
+
+*   **GET /find-horse-race?horseName={horseName}**
+
+    Finds the race time and meeting for a given horse.
+
+    **Example using cURL:**
+    ```sh
+    curl "http://localhost:8080/find-horse-race?horseName=SomeHorse"
+    ```
+
+*   **GET /past-run-dates?horseName={horseName}**
+
+    Retrieves all past race dates for a given horse.
+
+    **Example using cURL:**
+    ```sh
+    curl "http://localhost:8080/past-run-dates?horseName=SomeHorse"
+    ```
+
+*   **GET /next-race**
+
+    Retrieves the next race based on the current system time.
+
+    **Example using cURL:**
+    ```sh
+    curl http://localhost:8080/next-race
+    ```
+
+*   **GET /horse-form?time={time}&place={place}&horseName={horseName}**
+
+    Retrieves the recent form for a specific horse in a particular race.
+
+    **Example using cURL:**
+    ```sh
+    curl "http://localhost:8080/horse-form?time=13:30&place=Ascot&horseName=SomeHorse"
+    ```
+
+*   **GET /nap-of-the-day**
+
+    Retrieves the best bet of the day across all races.
+
+    **Example using cURL:**
+    ```sh
+    curl http://localhost:8080/nap-of-the-day
+    ```
+
 ### Spring AI Tools
 
 The `RacesInfo` class is annotated with `@Tool` and provides functions that can be used by a Spring AI-powered agent:
-*   `getMeetings()`: Retrieves all unique meeting place names from the race data.
-*   `getTopRated(String time, String place)`: Get the top rated horse for a particular race, identified by its time and place. This is the highest single rating from any past race.
+*   `getBestEverRated(String time, String place)`: Get the best rated horse for a particular race, identified by its time and place. This is the highest single rating from any past race.
+*   `getTopRated(String time, String place)`: Get the horse with the best average rating over last 3 runs for a particular race, identified by its time and place.
+*   `getBottomRated(String time, String place)`: Get the horse with the worst average rating over last 3 runs (the fiddle) for a particular race, identified by its time and place.
 *   `getBestAverageRated(String time, String place)`: Get the horse with the best average rating for a particular race, identified by its time and place.
 *   `getBestMostRecentRated(String time, String place)`: Get the horse with the highest rating from its most recent race, for a particular race identified by its time and place.
 *   `getAllRunners(String time, String place)`: Get all the runners for a particular race, identified by its time and place.
+*   `getPastRunDates(String horseName)`: Get all the past race dates for a given horse name.
 *   `getAllTimes(String place)`: Get all the race times for a given meeting place.
-*   `getRawRaceData()`: Reads the raw race data file from the configured Google Cloud Storage bucket.
+*   `getMeetings()`: Retrieve all unique meeting place names from the race data.
+*   `findHorseRace(String horseName)`: Finds the race time and meeting for a given horse name.
+*   `getNextRace()`: Reports the next race time and meeting based on the current system time.
+*   `getHorseForm(String time, String place, String horseName)`: Get the recent form (past race dates and ratings) for a specific horse in a particular race.
+*   `getNapOfTheDay()`: Find the best bet of the day across all races, based on the highest average rating over the last 3 runs.
+*   `getHandicapNapOfTheDay()`: Find the best bet of the day from handicap races only, based on the highest average rating over the last 3 runs.
