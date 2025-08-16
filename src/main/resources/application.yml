@@ -4,11 +4,12 @@ spring:
       server:
         name: pluckiermcp
         version: 1.0.0
+        stdio: true
   application:
     name: mcp
   main:
     banner-mode: off
-    web-application-type: none
+    web-application-type: servlet
 
 logging:
   pattern:

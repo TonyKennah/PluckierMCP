@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Include Spring's default configurations for things like console color coding -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+
+    <!-- A console appender for server-side logging -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+
+    <!-- The custom WebSocket appender -->
+    <appender name="WEBSOCKET" class="uk.co.kennah.mcp.WebSocketLogAppender">
+        <encoder>
+            <!-- This pattern will be sent to the browser -->
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- The root logger directs all logs to the specified appenders -->
+    <root level="INFO">
+        <appender-ref ref="WEBSOCKET" />
+    </root>
+
+</configuration>

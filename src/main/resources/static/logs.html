@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pluckier MCP Server Log</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <style>
+        body { font-family: 'Courier New', Courier, monospace; background-color: #1e1e1e; color: #d4d4d4; margin: 0; padding: 1em; }
+        h2 { color: #4ec9b0; }
+        #log-container {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background-color: #252526;
+            border: 1px solid #3c3c3c;
+            padding: 10px;
+            height: 85vh;
+            overflow-y: scroll;
+        }
+    </style>
+</head>
+<body>
+    <h2>Pluckier MCP Server Log Stream</h2>
+    <div id="log-container"></div>
+
+    <script type="text/javascript">
+        const logContainer = document.getElementById('log-container');
+        let stompClient = null;
+
+        function connect() {
+            const socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+                logContainer.innerHTML += '--- Connected to log stream ---\n';
+                stompClient.subscribe('/topic/logs', function (logMessage) {
+                    logContainer.innerHTML += logMessage.body;
+                    // Auto-scroll to the bottom
+                    logContainer.scrollTop = logContainer.scrollHeight;
+                });
+            }, function(error) {
+                console.error('STOMP error', error);
+                logContainer.innerHTML += '--- Disconnected from log stream. Attempting to reconnect... ---\n';
+                setTimeout(connect, 5000); // Reconnect after 5 seconds
+            });
+        }
+
+        connect();
+    </script>
+</body>
+</html>

@@ -11,6 +11,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.google.cloud.storage.StorageException;
 import com.google.gson.Gson;
@@ -23,6 +25,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RacesInfo {
+
+    private static final Logger logger = LoggerFactory.getLogger(RacesInfo.class);
 
     @Autowired
     private GCSReader gcsReader;
@@ -51,6 +55,7 @@ public class RacesInfo {
 
     @Tool(name = "getBestEverRated", description = "Get the best rated horse for a particular race, identified by its time and place. This is the highest single rating from any past race.")
     public String getBestEverRated(String time, String place) {
+        logger.info("AI tool call for best ever rated horse in the {} at {}", time, place);
         // Local record for temporary data holding
         record HorseRating(String name, int rating) {}
 
@@ -69,6 +74,7 @@ public class RacesInfo {
 
     @Tool(name = "getTopRated", description = "Get the horse with the best average rating over last 3 runs for a particular race, identified by its time and place.")
     public String getTopRated(String time, String place) {
+        logger.info("AI tool call for top rated (last 3 runs) horse in the {} at {}", time, place);
         // Local record for temporary data holding
         record HorseAverageRating(String name, int average) {}
 
@@ -94,6 +100,7 @@ public class RacesInfo {
 
     @Tool(name = "getBottomRated", description = "Get the horse with the worst average rating over last 3 runs (the fiddle) for a particular race, identified by its time and place.")
     public String getBottomRated(String time, String place) {
+        logger.info("AI tool call for bottom rated (last 3 runs) horse in the {} at {}", time, place);
         // Local record for temporary data holding
         record HorseAverageRating(String name, int average) {}
 
@@ -119,6 +126,7 @@ public class RacesInfo {
 
     @Tool(name = "getBestAverageRated", description = "Get the horse with the best average rating for a particular race, identified by its time and place.")
     public String getBestAverageRated(String time, String place) {
+        logger.info("AI tool call for best average rated horse in the {} at {}", time, place);
         // Local record for temporary data holding
         record HorseAverageRating(String name, double average) {}
 
@@ -143,6 +151,7 @@ public class RacesInfo {
 
     @Tool(name = "getBestMostRecentRated", description = "Get the horse with the highest rating from its most recent race, for a particular race identified by its time and place.")
     public String getBestMostRecentRated(String time, String place) {
+        logger.info("AI tool call for best most recent rated horse in the {} at {}", time, place);
         // Local record for temporary data holding
         record HorseRecentRating(String name, int rating) {}
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -158,8 +167,6 @@ public class RacesInfo {
                                     .filter(form -> form.has("date"))
                                     .max(Comparator.comparing(form -> LocalDate.parse(form.get("date").getAsString(), formatter)));
                             
-                                    System.out.println("-----------------------------" + place + " " + time + " " + mostRecentForm.toString());
-                           
                                     return mostRecentForm.filter(form -> form.has("name"))
                                     .map(form -> new HorseRecentRating(horse.get("name").getAsString(), form.get("name").getAsInt()));
                         })
@@ -173,6 +180,7 @@ public class RacesInfo {
 
     @Tool(name = "getAllRunners", description = "Get all the runners for a particular race, identified by its time and place.")
     public String getAllRunners(String time, String place) {
+        logger.info("AI tool call for all runners in the {} at {}", time, place);
         return findRace(time, place)
                 .map(race -> {
                     String runners = StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
@@ -186,6 +194,7 @@ public class RacesInfo {
 
     @Tool(name = "getPastRunDates", description = "Get all the past race dates for a given horse name.")
     public String getPastRunDates(String horseName) {
+        logger.info("AI tool call for past run dates for horse: {}", horseName);
         JsonArray races = getCachedRaceData();
         if (races == null) {
             return "Error: Race data is not available or in the expected format.";
@@ -224,6 +233,7 @@ public class RacesInfo {
 
     @Tool(name = "getAllTimes", description = "Get all the race times for a given meeting place.")
     public String getAllTimes(String place) {
+        logger.info("AI tool call for all race times at {}", place);
         JsonArray races = getCachedRaceData();
         if (races == null) return "Error: Race data is not in the expected format.";
 
@@ -241,6 +251,7 @@ public class RacesInfo {
 
     @Tool(name = "getMeetings", description = "Retrieve all unique meeting place names from the race data.")
     public String getMeetings() {
+        logger.info("AI tool call for all meeting places");
         try {
             JsonArray races = getCachedRaceData();
             if (races == null) return "Error: Race data is not in the expected format.";
@@ -262,6 +273,7 @@ public class RacesInfo {
 
     @Tool(name = "findHorseRace", description = "Finds the race time and meeting for a given horse name.")
     public String findHorseRace(String horseName) {
+        logger.info("AI tool call to find race for horse: {}", horseName);
         JsonArray races = getCachedRaceData();
         if (races == null) {
             return "Error: Race data is not available or in the expected format.";
@@ -285,6 +297,7 @@ public class RacesInfo {
 
     @Tool(name = "getNextRace", description = "Reports the next race time and meeting based on the current system time.")
     public String getNextRace() {
+        logger.info("AI tool call for the next race");
         JsonArray races = getCachedRaceData();
         if (races == null) {
             return "Error: Race data is not available or in the expected format.";
@@ -312,6 +325,7 @@ public class RacesInfo {
 
     @Tool(name = "getHorseForm", description = "Get the recent form (past race dates and ratings) for a specific horse in a particular race.")
     public String getHorseForm(String time, String place, String horseName) {
+        logger.info("AI tool call for form for horse {} in the {} at {}", horseName, time, place);
         Optional<JsonObject> raceOptional = findRace(time, place);
         if (raceOptional.isEmpty()) {
             return "Could not find the race at " + place + " at " + time;
@@ -348,6 +362,7 @@ public class RacesInfo {
 
     @Tool(name = "getNapOfTheDay", description = "Find the best bet of the day across all races, based on the highest average rating over the last 3 runs.")
     public String getNapOfTheDay() {
+        logger.info("AI tool call for Nap of the Day");
         JsonArray races = getCachedRaceData();
         if (races == null) {
             return "Error: Race data is not available or in the expected format.";
@@ -386,6 +401,7 @@ public class RacesInfo {
 
     @Tool(name = "getHandicapNapOfTheDay", description = "Find the best bet of the day from handicap races only, based on the highest average rating over the last 3 runs.")
     public String getHandicapNapOfTheDay() {
+        logger.info("AI tool call for Handicap Nap of the Day");
         JsonArray races = getCachedRaceData();
         if (races == null) {
             return "Error: Race data is not available or in the expected format.";
