@@ -59,7 +59,7 @@ The server will start on `http://localhost:8080`.
 
 <details>
 <summary>Code Description</summary>
-    What it does: This class configures the real-time messaging pipeline. It enables Spring's WebSocket message broker and defines the connection endpoint (`/ws`) that clients use. It also sets up the message channels (like `/topic`) that allow the server to broadcast messages to subscribed clients, which is essential for the live logging feature.
+
 *   **1. McpServerApplication.java (The Application Entry Point)**
     What it does: This is the heart of the application. The main method in this class is what you run to start the entire server. The `@SpringBootApplication` annotation kicks off a lot of magic, including starting a web server, scanning for other components (like its endpoints and services), and configuring them automatically. It also uses `@EnableCaching` to turn on the caching feature.
     Why it's required: Without this class, the application is just a collection of files; it wouldn't know how to start or run. It's the main bootstrap class.
@@ -80,7 +80,6 @@ The server will start on `http://localhost:8080`.
     Why it's required: It prevents a "circular reference" crash on startup. It safely links the logging system to the web system at the correct time.
 *   **7. WebSocketConfig.java (The Messaging Pipeline)**
     What it does: This class configures the real-time messaging pipeline. It enables Spring's WebSocket message broker and defines the connection endpoint (`/ws`) that clients use. It also sets up the message channels (like `/topic`) that allow the server to broadcast messages to subscribed clients, which is essential for the live logging feature.
-    Why it's required:
     Why it's required:
 
 How It All Connects
