@@ -2,10 +2,13 @@ package uk.co.kennah.mcp;
 
 import com.google.gson.JsonParser;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.co.kennah.mcp.gcp.GCSReader;
 import uk.co.kennah.mcp.rest.RacesInfoController;
@@ -20,18 +23,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class McpServerApplicationTests {
 
+	/**
+	 * This nested configuration class is used to define mock beans for our tests.
+	 * Beans defined here will override the primary beans in the application context.
+	 */
+	@TestConfiguration
+	static class McpServerTestConfiguration {
+		@Bean
+		@Primary // Ensures this mock bean is used instead of the real one
+		public GCSReader gcsReader() {
+			return Mockito.mock(GCSReader.class);
+		}
+	}
+
 	@Autowired
 	private MockMvc mockMvc;
 
 	@Autowired
 	private RacesInfoController controller;
 
-	@MockBean
+	@Autowired
 	private GCSReader gcsReader;
 
 	@Test
 	void contextLoads() {
 		assertThat(controller).isNotNull();
+		assertThat(gcsReader).isNotNull();
 	}
 
 	@Test
