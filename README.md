@@ -57,7 +57,6 @@ To run the application, use the Spring Boot Maven plugin:
 The server will start on `http://localhost:8080`.
 
 
-<details>
 <summary>Code Description</summary>
 
 *   **1. McpServerApplication.java (The Application Entry Point)**
