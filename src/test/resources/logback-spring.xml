@@ -22,7 +22,7 @@
 
     <!-- The root logger directs all logs to the specified appenders -->
     <root level="INFO">
-        <appender-ref ref="WEBSOCKET" />
+        <appender-ref ref="CONSOLE" />
     </root>
 
 </configuration>
