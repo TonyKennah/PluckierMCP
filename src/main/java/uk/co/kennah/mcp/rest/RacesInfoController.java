@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.co.kennah.mcp.aitools.RacesInfo;
 
 @RestController
-public class ReaderEndpoint {
+public class RacesInfoController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ReaderEndpoint.class);
+    private static final Logger logger = LoggerFactory.getLogger(RacesInfoController.class);
 
     @Autowired
     private RacesInfo racesInfo;
