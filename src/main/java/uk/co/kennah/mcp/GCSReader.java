@@ -31,7 +31,7 @@ public class GCSReader {
 
     @Cacheable("raceData")
     public JsonElement readFileFromGCSAsJson() {
-        logger.info("Reading file '{}' from GCS bucket '{}'", file, bucket);
+        logger.info("Reading all of today's horse racing data to cache.");
         try {
             BlobId blobId = BlobId.of(bucket, file);
             Blob blob = storage.get(blobId);
