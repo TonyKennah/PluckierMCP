@@ -1,6 +1,9 @@
 - `src/main/java`: Contains the main application source code.
   - `uk/co/kennah/mcp/McpServerApplication.java`: The main Spring Boot application class.
-  - `uk/co/kennah/mcp/RacesInfo.java`: A service that provides information about horse races.
-  - `uk/co/kennah/mcp/Something.java`: A REST controller that exposes the `/info` endpoint.
+  - `uk/co/kennah/mcp/aitools/RacesInfo.java`: A service that provides tool callbacks for an AI agent.
+  - `uk/co/kennah/mcp/gcp/GCSReader.java`: A component for reading data from Google Cloud Storage.
+  - `uk/co/kennah/mcp/log`: Contains classes related to logging.
+  - `uk/co/kennah/mcp/rest/RacesInfoController.java`: A REST controller that exposes endpoints for retrieving race information.
+  - `uk/co/kennah/mcp/utils/Util.java`: A utility class with helper methods.
 - `pom.xml`: The Maven project object model file, which defines the project's dependencies and build configuration.
 - `README.md`: A file containing a brief description of the project and instructions on how to build and run it.
