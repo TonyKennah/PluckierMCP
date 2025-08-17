@@ -4,17 +4,11 @@
 
 # Pluckier MCP Server
 
-![Example](gemini.jpg "Gemini using pluckier")
-
-# Communication Viewer
-<img width="1803" height="605" alt="image" src="https://github.com/user-attachments/assets/6180d2db-c894-4e1b-ab51-65b0b7b58d9a" />
-
-# Pluckier MCP
-This is a Spring Boot application that provides information about horse races and interacts with Google Cloud Storage. It uses Spring AI to expose tool functions for an AI agent and exposes a REST endpoint `/info` to retrieve race information from a JSON file stored in a GCS bucket.
+This is a Spring Boot application that provides information about horse races.  It uses Spring AI to expose tool functions for an AI agents and has REST endpoints to retrieve race information.  It pulls daily racing data in JSON format stored in a GCS bucket.
 
 ## Technology Stack
 
-Simple code but all about the information.
+Simple enough code but it's all about the information, right?
 
 *   Spring Framework
 *   Java 17
@@ -27,73 +21,50 @@ Simple code but all about the information.
 
 *   Java Development Kit (JDK) 17 or later.
 *   Apache Maven.
-*   Access to Google Cloud Storage. You must be authenticated, for example by running `gcloud auth application-default login`.
+*   ⚠️ Access to the specific GCP Cloud storage location, with access credentials stored in the environment:  GOOGLE_APPLICATION_CREDENTIALS
 
-## Configuration
-
-The application is configured via `src/main/resources/application.properties`. You must provide the following properties for it to connect to Google Cloud Storage:
-
-*   `gcs.bucket.name`: The name of your GCS bucket.
-*   `gcs.file.name`: The name of the JSON file within the bucket.
-
-Example `application.properties`:
-```properties
-gcs.bucket.name=your-gcs-bucket
-gcs.file.name=your-race-data.json
-```
-
-## Building the Project
+## Building & Running the Project
 
 You can build the project using the Maven wrapper:
 
 ```sh
-./mvnw clean install
+./mvn clean install
 ```
 
 ## Running the Application
 
-To run the application, use the Spring Boot Maven plugin:
+Generally you run the server via an AI agent such as Gemini Cli.  Via a Java command within Gemini settings.json file.
+```
+{
+    "mcpServers": {
+        "pluckier": {
+            "command": "java",
+            "args": [
+	            "-Dspring.ai.mcp.server.stdio=true",
+                "-jar",
+                "<PATH_TO>target\\mcp-server-0.0.1-SNAPSHOT.jar"
+            ]
+        }
+    }
+}
+```    
+
+To run the application manually, use the Spring Boot Maven plugin:
 
 ```sh
-./mvnw spring-boot:run
+./mvn spring-boot:run
 ```
 
-The server will start on `http://localhost:8080`.
+Or a java command:
 
+```sh
+./java -jar target/mcp-server-0.0.1-SNAPSHOT.jar
+```
 
-<summary>Code Description</summary>
+The server will start on `http://localhost:8080` which shows links to the log viewer and exposes the parameterised REST endpoints.
 
-*   **1. McpServerApplication.java (The Application Entry Point)**
-    What it does: This is the heart of the application. The main method in this class is what you run to start the entire server. The `@SpringBootApplication` annotation kicks off a lot of magic, including starting a web server, scanning for other components (like its endpoints and services), and configuring them automatically. It also uses `@EnableCaching` to turn on the caching feature.
-    Why it's required: Without this class, the application is just a collection of files; it wouldn't know how to start or run. It's the main bootstrap class.
-*   **2. GCSReader.java (The Data Source Connector)**
-    What it does: This class's only job is to connect to Google Cloud Storage (GCS) and fetch the race data file. The `@Cacheable("raceData")` annotation is critical here; it ensures that the application only reads the file from the cloud once. After the first read, the data is stored in memory (cached), making all subsequent requests for the data extremely fast.
-    Why it's required: This is the sole provider of data for the entire application. Without it, `RacesInfo` would have no information to analyze or serve.
-*   **3. RacesInfo.java (The Brains of the Operation)**
-    What it does: This is the primary service or "business logic" class. It takes the raw JSON data from `GCSReader` and contains all the methods to make sense of it (e.g., `getNapOfTheDay`, `getBestEverRated`, `getAllRunners`). The `@Tool` annotation on each method is what exposes it to the Spring AI framework, allowing the AI to intelligently call these functions to answer questions.
-    Why it's required: This class contains all the core functionality. Both the AI and the REST endpoints rely entirely on the methods in this class to get information.
-*   **4. ReaderEndpoint.java (The Public Web API)**
-    What it does: This class creates the standard REST API for the application. It uses `@RestController` and `@GetMapping` to expose the methods from `RacesInfo` as simple web URLs (like `/meetings` or `/next-race`). This allows other programs or simple web pages to get data from the application without needing to interact with the AI.
-    Why it's required: This provides a direct, non-AI way to access the application's logic. It's the bridge between the web and the `RacesInfo` service.
-*   **5. WebSocketLogAppender.java (The Live Log Streamer)**
-    What it does: This is a custom piece of the logging framework (Logback). Its purpose is to intercept every log message generated by the application (`logger.info(...)`, etc.) and send a copy of it over a WebSocket to the browser. This is what powers the real-time log view on the `logs.html` page. It even includes logic to cache logs that happen at the very start of the application, before the WebSocket connection is ready.
-    Why it's required: This is essential for the live logging feature. If you removed it, you would no longer see log messages appearing in the web browser.
-*   **6. WebSocketLogAppenderConfig.java (The Logging "Glue")**
-    What it does: This small but vital class solves a tricky startup problem. The logging system starts very early, before the rest of the application (like the WebSocket messaging system) is ready. This class waits for the `ContextRefreshedEvent`, which signals that the application is fully started. It then safely connects the `WebSocketLogAppender` to the messaging system, allowing it to start sending logs.
-    Why it's required: It prevents a "circular reference" crash on startup. It safely links the logging system to the web system at the correct time.
-*   **7. WebSocketConfig.java (The Messaging Pipeline)**
-    What it does: This class configures the real-time messaging pipeline. It enables Spring's WebSocket message broker and defines the connection endpoint (`/ws`) that clients use. It also sets up the message channels (like `/topic`) that allow the server to broadcast messages to subscribed clients, which is essential for the live logging feature.
-    Why it's required:
+<img width="1236" height="1046" alt="image" src="https://github.com/user-attachments/assets/6d1f222c-7a53-46d5-afd7-0a4319352dc2" />
 
-How It All Connects
-- The logs.html frontend connects to the server at the /ws endpoint.
-- The frontend then subscribes to the /topic/logs channel.
-On the server, the WebSocketLogAppender intercepts a log message.
-- The appender sends that message to the /topic/logs destination.
-- The message broker, configured by this class, receives the message and broadcasts it to all clients subscribed to /topic/logs.
-
-
-## Usage
 
 ### Live Log Viewer
 
@@ -106,153 +77,15 @@ The application provides a real-time log viewer to monitor server activity. This
     ```
 3.  The page will automatically connect to the server's WebSocket endpoint and display log messages as they are generated.
 
+<img width="1803" height="605" alt="image" src="https://github.com/user-attachments/assets/6180d2db-c894-4e1b-ab51-65b0b7b58d9a" />
+
 ---
-
-### REST API
-
-The application provides several REST endpoints to test the data retrieval logic that is also exposed to the AI agent.
-
-*   **GET /meetings**
-
-    Retrieves all unique meeting place names.
-
-    **Example using cURL:**
-    ```sh
-    curl http://localhost:8080/meetings
-    ```
-
-*   **GET /top-rated?time={time}&place={place}**
-
-    Retrieves the horse with the best average rating over its last 3 runs for a specific race.
-
-    **Example using cURL:**
-    ```sh
-    curl "http://localhost:8080/top-rated?time=14:05&place=Ascot"
-    ```
-
-*   **GET /bottom-rated?time={time}&place={place}**
-
-    Retrieves the horse with the worst average rating over its last 3 runs for a specific race.
-
-    **Example using cURL:**
-    ```sh
-    curl "http://localhost:8080/bottom-rated?time=14:05&place=Ascot"
-    ```
-
-*   **GET /best-ever-rated?time={time}&place={place}**
-
-    Retrieves the horse with the highest single rating from any past race for a specific race.
-
-    **Example using cURL:**
-    ```sh
-    curl "http://localhost:8080/best-ever-rated?time=14:05&place=Ascot"
-    ```
-
-*   **GET /best-average-rated?time={time}&place={place}**
-
-    Retrieves the horse with the best average rating across all its past runs for a specific race.
-
-    **Example using cURL:**
-    ```sh
-    curl "http://localhost:8080/best-average-rated?time=13:30&place=Ascot"
-    ```
-
-*   **GET /best-most-recent-rated?time={time}&place={place}**
-
-    Retrieves the horse with the highest rating from its most recent race.
-
-    **Example using cURL:**
-    ```sh
-    curl "http://localhost:8080/best-most-recent-rated?time=13:30&place=Ascot"
-    ```
-
-*   **GET /race-win-percentages?time={time}&place={place}**
-
-    Calculates the win percentage for each horse in a race based on their best-ever rating.
-
-    **Example using cURL:**
-    ```sh
-    curl "http://localhost:8080/race-win-percentages?time=14:05&place=Ascot"
-    ```
-
-*   **GET /all-runners?time={time}&place={place}**
-
-    Retrieves all runners for a specific race.
-
-    **Example using cURL:**
-    ```sh
-    curl "http://localhost:8080/all-runners?time=13:30&place=Ascot"
-    ```
-
-*   **GET /all-times?place={place}**
-
-    Retrieves all race times for a given meeting place.
-
-    **Example using cURL:**
-    ```sh
-    curl "http://localhost:8080/all-times?place=Ascot"
-    ```
-
-*   **GET /find-horse-race?horseName={horseName}**
-
-    Finds the race time and meeting for a given horse.
-
-    **Example using cURL:**
-    ```sh
-    curl "http://localhost:8080/find-horse-race?horseName=SomeHorse"
-    ```
-
-*   **GET /past-run-dates?horseName={horseName}**
-
-    Retrieves all past race dates for a given horse.
-
-    **Example using cURL:**
-    ```sh
-    curl "http://localhost:8080/past-run-dates?horseName=SomeHorse"
-    ```
-
-*   **GET /next-race**
-
-    Retrieves the next race based on the current system time.
-
-    **Example using cURL:**
-    ```sh
-    curl http://localhost:8080/next-race
-    ```
-
-*   **GET /horse-form?time={time}&place={place}&horseName={horseName}**
-
-    Retrieves the recent form for a specific horse in a particular race.
-
-    **Example using cURL:**
-    ```sh
-    curl "http://localhost:8080/horse-form?time=13:30&place=Ascot&horseName=SomeHorse"
-    ```
-
-*   **GET /nap-of-the-day**
-
-    Retrieves the best bet of the day across all races.
-
-    **Example using cURL:**
-    ```sh
-    curl http://localhost:8080/nap-of-the-day
-    ```
 
 ### Spring AI Tools
 
-The `RacesInfo` class is annotated with `@Tool` and provides functions that can be used by a Spring AI-powered agent:
-*   `get_best_ever_rated(String time, String place)`: Get the best rated horse for a particular race, identified by its time and place. This is the highest single rating from any past race.
-*   `get_top_rated(String time, String place)`: Get the horse with the best average rating over its last 3 runs for a particular race.
-*   `get_bottom_rated(String time, String place)`: Get the horse with the worst average rating over its last 3 runs.
-*   `get_best_average_rated(String time, String place)`: Get the horse with the best average rating across all its past runs for a particular race.
-*   `get_best_most_recent_rated(String time, String place)`: Get the horse with the highest rating from its most recent race.
-*   `get_race_win_percentages(String time, String place)`: Calculates the win percentage for each horse in a race based on their best-ever rating.
-*   `get_all_runners(String time, String place)`: Get all the runners for a particular race.
-*   `get_past_run_dates(String horseName)`: Get all the past race dates for a given horse.
-*   `get_all_times(String place)`: Get all the race times for a given meeting place.
-*   `get_meetings()`: Retrieve all unique meeting place names.
-*   `find_horse_race(String horseName)`: Finds the race time and meeting for a given horse.
-*   `get_next_race()`: Reports the next race time and meeting based on the current system time.
-*   `get_horse_form(String time, String place, String horseName)`: Get the recent form (past race dates and ratings) for a specific horse in a particular race.
-*   `get_nap_of_the_day()`: Find the best bet of the day across all races, based on the highest average rating over the last 3 runs.
-*   `get_handicap_nap_of_the_day()`: Find the best bet of the day from handicap races only, based on the highest average rating over the last 3 runs.
+<img width="474" height="503" alt="image" src="https://github.com/user-attachments/assets/9e31b882-2438-403c-a313-6b957dea07dc" />
+
+Example:
+
+![Example](gemini.jpg "Gemini using pluckier")
+
