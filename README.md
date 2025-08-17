@@ -4,10 +4,7 @@
 
 # Pluckier MCP Server
 
-![Example](gemini.jpg "Gemini using pluckier")
-
-# Pluckier MCP
-This is a Spring Boot application that provides information about horse races.  It uses Spring AI to expose tool functions for an AI agent and REST endpoints to retrieve race information in JSON format stored in a GCS bucket.
+This is a Spring Boot application that provides information about horse races.  It uses Spring AI to expose tool functions for an AI agents and has REST endpoints to retrieve race information.  It pulls daily racing data in JSON format stored in a GCS bucket.
 
 ## Technology Stack
 
@@ -24,6 +21,7 @@ Simple enough code but it's all about the information, right?
 
 *   Java Development Kit (JDK) 17 or later.
 *   Apache Maven.
+*   Access to the specific GCP Cloud storage location, with access credentials stored in the environment:  GOOGLE_APPLICATION_CREDENTIALS
 
 ## Building & Running the Project
 
