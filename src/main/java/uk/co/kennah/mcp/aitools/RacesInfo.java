@@ -5,27 +5,22 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
-import java.util.DoubleSummaryStatistics;
-import java.util.IntSummaryStatistics;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.google.cloud.storage.StorageException;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import uk.co.kennah.mcp.gcp.GCSReader;
+import uk.co.kennah.mcp.utils.Util;
 
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Service;
@@ -33,77 +28,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class RacesInfo {
 
-    // Local record for temporary data holding
-    private record HorseAverageRating(String name, double average) {}
-
     private static final Logger logger = LoggerFactory.getLogger(RacesInfo.class);
 
     @Autowired
     private GCSReader gcsReader;
 
     private JsonArray getCachedRaceData() {
-        JsonElement jsonElement = gcsReader.readFileFromGCSAsJson();
-        if (jsonElement == null || !jsonElement.isJsonArray()) {
-            // This case will be handled by the calling methods if they receive null.
-            return null;
-        }
-        return jsonElement.getAsJsonArray();
+        return Util.getCachedRaceData(gcsReader);
     }
-
-    private Optional<JsonObject> findRace(String time, String place) {
-        JsonArray races = getCachedRaceData();
-        if (races == null) {
-            return Optional.empty();
-        }
-        return StreamSupport.stream(races.spliterator(), false)
-                .map(JsonElement::getAsJsonObject)
-                .filter(race -> race.get("place").getAsString().equalsIgnoreCase(place)
-                        && race.get("time").getAsString().equals(time))
-                .findFirst();
-    }
-
-    private double calculateAverageRating(JsonObject horse, Optional<Integer> limit) {
-        if (!horse.has("past") || !horse.get("past").isJsonArray()) {
-            return -1;
-        }
-        var pastStream = StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
-                .map(JsonElement::getAsJsonObject);
-
-        var limitedStream = limit.map(pastStream::limit).orElse(pastStream);
-
-        IntSummaryStatistics stats = limitedStream
-                .filter(form -> form.has("name") && form.get("name").isJsonPrimitive())
-                .mapToInt(form -> form.get("name").getAsInt())
-                .summaryStatistics();
-        
-        return stats.getCount() > 0 ? stats.getAverage() : -1;
-    }
-
-    private String findHorseByAverageRating(String time, String place, Optional<Integer> limit, boolean findMax, String description, String failureMessage) {
-        return findRace(time, place)
-                .map(race -> {
-                    Stream<HorseAverageRating> ratingsStream = StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
-                            .map(JsonElement::getAsJsonObject)
-                            .map(horse -> new HorseAverageRating(
-                                    horse.get("name").getAsString(),
-                                    calculateAverageRating(horse, limit)
-                            ))
-                            .filter(h -> h.average() >= 0);
-
-                    Optional<HorseAverageRating> result;
-                    if (findMax) {
-                        result = ratingsStream.max(Comparator.comparingDouble(HorseAverageRating::average));
-                    } else {
-                        result = ratingsStream.min(Comparator.comparingDouble(HorseAverageRating::average));
-                    }
-
-                    return result.map(horse -> description + " for the " + time + " at " + place + " is: " + horse.name()
-                                    + " with an average rating of " + String.format("%.2f", horse.average()))
-                            .orElse(failureMessage + " for the race at " + place + " at " + time);
-                })
-                .orElse("Could not find the race at " + place + " at " + time);
-    }
-
 
     @Tool(name = "get_best_ever_rated", description = "Get the best rated horse for a particular race, identified by its time and place. This is the highest single rating from any past race.")
     public String getBestEverRated(String time, String place) {
@@ -111,7 +43,7 @@ public class RacesInfo {
         // Local record for temporary data holding
         record HorseRating(String name, int rating) {}
 
-        return findRace(time, place)
+        return Util.findRace(time, place, gcsReader)
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                         .map(JsonElement::getAsJsonObject)
                         .filter(horse -> horse.has("past") && horse.get("past").isJsonArray())
@@ -128,7 +60,7 @@ public class RacesInfo {
     @Tool(name = "get_top_rated", description = "Get the horse with the best average rating over last 3 runs for a particular race, identified by its time and place.")
     public String getTopRated(String time, String place) {
         logger.info("AI tool call for top rated (last 3 runs) horse in the {} at {}", time, place);
-        return findHorseByAverageRating(time, place, Optional.of(3), true,
+        return Util.findHorseByAverageRating(time, place, gcsReader, Optional.of(3), true,
                 "Horse with best last 3 run average rating",
                 "No horses with a recent average rating found");
     }
@@ -136,7 +68,7 @@ public class RacesInfo {
     @Tool(name = "get_bottom_rated", description = "Get the horse with the worst average rating over last 3 runs (the fiddle) for a particular race, identified by its time and place.")
     public String getBottomRated(String time, String place) {
         logger.info("AI tool call for bottom rated (last 3 runs) horse in the {} at {}", time, place);
-        return findHorseByAverageRating(time, place, Optional.of(3), false,
+        return Util.findHorseByAverageRating(time, place, gcsReader, Optional.of(3), false,
                 "Horse with worst last 3 run average rating",
                 "No horses with a recent average rating found");
     }
@@ -144,7 +76,7 @@ public class RacesInfo {
     @Tool(name = "get_best_average_rated", description = "Get the horse with the best average rating for a particular race, identified by its time and place.")
     public String getBestAverageRated(String time, String place) {
         logger.info("AI tool call for best average rated horse in the {} at {}", time, place);
-        return findHorseByAverageRating(time, place, Optional.empty(), true,
+        return Util.findHorseByAverageRating(time, place, gcsReader, Optional.empty(), true,
                 "Horse with best average rating",
                 "No horses with an average rating found");
     }
@@ -156,8 +88,7 @@ public class RacesInfo {
         record HorseRecentRating(String name, int rating) {}
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-
-        return findRace(time, place)
+        return Util.findRace(time, place, gcsReader)
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                         .map(JsonElement::getAsJsonObject)
                         .map(horse -> {
@@ -186,7 +117,7 @@ public class RacesInfo {
         // Local record for temporary data holding
         record HorseRating(String name, int rating) {}
 
-        return findRace(time, place)
+        return Util.findRace(time, place, gcsReader)
                 .map(race -> {
                     List<HorseRating> horseRatings = StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                             .map(JsonElement::getAsJsonObject)
@@ -223,7 +154,7 @@ public class RacesInfo {
     @Tool(name = "get_all_runners", description = "Get all the runners for a particular race, identified by its time and place.")
     public String getAllRunners(String time, String place) {
         logger.info("AI tool call for all runners in the {} at {}", time, place);
-        return findRace(time, place)
+        return Util.findRace(time, place, gcsReader)
                 .map(race -> {
                     String runners = StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                             .map(horse -> horse.getAsJsonObject().get("name").getAsString())
@@ -368,7 +299,7 @@ public class RacesInfo {
     @Tool(name = "get_horse_form", description = "Get the recent form (past race dates and ratings) for a specific horse in a particular race.")
     public String getHorseForm(String time, String place, String horseName) {
         logger.info("AI tool call for form for horse {} in the {} at {}", horseName, time, place);
-        Optional<JsonObject> raceOptional = findRace(time, place);
+        Optional<JsonObject> raceOptional = Util.findRace(time, place, gcsReader);
         if (raceOptional.isEmpty()) {
             return "Could not find the race at " + place + " at " + time;
         }
@@ -402,42 +333,10 @@ public class RacesInfo {
         return "Form for " + horseName + ": " + formDetails;
     }
 
-    private String findNap(Predicate<JsonObject> raceFilter, String successMessage, String failureMessage) {
-        JsonArray races = getCachedRaceData();
-        if (races == null) {
-            return "Error: Race data is not available or in the expected format.";
-        }
-
-        // Local record for holding candidate horses
-        record NapCandidate(String horseName, String time, String place, double averageRating) {}
-
-        Optional<NapCandidate> bestBet = StreamSupport.stream(races.spliterator(), false)
-                .map(JsonElement::getAsJsonObject)
-                .filter(race -> race.has("horses") && race.get("horses").isJsonArray())
-                .filter(raceFilter) // Apply the specific filter
-                .flatMap(race -> {
-                    String time = race.get("time").getAsString();
-                    String place = race.get("place").getAsString();
-                    return StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
-                            .map(JsonElement::getAsJsonObject)
-                            .map(horse -> {
-                                double average = calculateAverageRating(horse, Optional.of(3));
-                                return new NapCandidate(horse.get("name").getAsString(), time, place, average);
-                            });
-                })
-                .filter(candidate -> candidate.averageRating() >= 0)
-                .max(Comparator.comparingDouble(NapCandidate::averageRating));
-
-        return bestBet
-                .map(nap -> String.format(successMessage,
-                        nap.horseName(), nap.time(), nap.place(), nap.averageRating()))
-                .orElse(failureMessage);
-    }
-
     @Tool(name = "get_nap_of_the_day", description = "Find the best bet of the day across all races, based on the highest average rating over the last 3 runs.")
     public String getNapOfTheDay() {
         logger.info("AI tool call for Nap of the Day");
-        return findNap(
+        return Util.findNap(gcsReader,
                 race -> true, // No filter, include all races
                 "The nap of the day is %s in the %s at %s, with a recent average rating of %.2f.",
                 "Could not determine a nap of the day from the available data.");
@@ -449,7 +348,7 @@ public class RacesInfo {
         Predicate<JsonObject> handicapFilter = race -> race.has("detail")
                 && race.get("detail").getAsString().toLowerCase().contains("handicap");
 
-        return findNap(
+        return Util.findNap(gcsReader,
                 handicapFilter,
                 "The handicap nap of the day is %s in the %s at %s, with a recent average rating of %.2f.",
                 "Could not determine a nap of the day from today's handicap races.");
@@ -464,7 +363,7 @@ public class RacesInfo {
             return isHandicap && isUk;
         };
 
-        return findNap(
+        return Util.findNap(gcsReader,
                 ukHandicapFilter,
                 "The UK handicap nap of the day is %s in the %s at %s, with a recent average rating of %.2f.",
                 "Could not determine a nap of the day from today's UK handicap races.");
