@@ -33,7 +33,7 @@ You can build the project using the Maven wrapper:
 
 ## Running the Application
 
-Generally you run the server via an AI agent such as Gemini Cli.  Via a Java command within Gemini settings.json file.
+Generally you run the server via an AI agent such as Gemini Cli, Claude Desktop, or ChatGPT.  Via a Java command, example for Gemini (settings.json file).
 ```
 {
     "mcpServers": {
