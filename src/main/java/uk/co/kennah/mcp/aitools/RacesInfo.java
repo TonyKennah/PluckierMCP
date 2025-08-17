@@ -1,27 +1,16 @@
 package uk.co.kennah.mcp.aitools;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import uk.co.kennah.mcp.gcp.GCSReader;
 import uk.co.kennah.mcp.utils.Util;
-
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Service;
 
@@ -112,50 +101,13 @@ public class RacesInfo {
     @Tool(name = "get_race_win_percentages", description = "Calculates the win percentage for each horse in a race based on their best-ever rating.")
     public String getRaceWinPercentages(String time, String place) {
         logger.info("AI tool call for race win percentages in the {} at {}", time, place);
-        // Local record for temporary data holding
-        record HorseRating(String name, int rating) {}
-
-        return Util.findRace(time, place, gcsReader)
-                .map(race -> {
-                    List<HorseRating> horseRatings = StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
-                            .map(JsonElement::getAsJsonObject)
-                            .map(horse -> {
-                                String horseName = horse.get("name").getAsString();
-                                if (!horse.has("past") || !horse.get("past").isJsonArray()) {
-                                    return new HorseRating(horseName, 0);
-                                }
-                                return new HorseRating(horseName, Util.getMaxRating(horse).orElse(0));
-                            })
-                            .collect(Collectors.toList());
-
-                    long totalRatingPool = horseRatings.stream().mapToLong(HorseRating::rating).sum();
-
-                    if (totalRatingPool == 0) {
-                        return "No rating data available to calculate win percentages for the race at " + place + " at " + time;
-                    }
-
-                    String result = horseRatings.stream()
-                            .sorted(Comparator.comparing(HorseRating::rating).reversed())
-                            .map(hr -> String.format("%s: %.2f%%", hr.name(), (hr.rating() / (double) totalRatingPool) * 100))
-                            .collect(Collectors.joining(", "));
-
-                    return "Win percentages for the " + time + " at " + place + ": " + result;
-                })
-                .orElse("Could not find the race at " + place + " at " + time);
+        return Util.findRaceWinPercentages(time, place, gcsReader);
     }
 
     @Tool(name = "get_all_runners", description = "Get all the runners for a particular race, identified by its time and place.")
     public String getAllRunners(String time, String place) {
         logger.info("AI tool call for all runners in the {} at {}", time, place);
-        return Util.findRace(time, place, gcsReader)
-                .map(race -> {
-                    String runners = StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
-                            .map(horse -> horse.getAsJsonObject().get("name").getAsString())
-                            .collect(Collectors.joining(", "));
-                    return runners.isEmpty() ? "No runners found for the race at " + place + " at " + time
-                            : "Runners for the " + time + " at " + place + ": " + runners;
-                })
-                .orElse("Could not find the race at " + place + " at " + time);
+        return Util.findAllRunners(time, place, gcsReader);
     }
 
     @Tool(name = "get_past_run_dates", description = "Get all the past race dates for a given horse name.")
@@ -194,16 +146,10 @@ public class RacesInfo {
         try {
             JsonArray races = getCachedRaceData();
             if (races == null) return "Error: Race data is not in the expected format.";
-            Set<String> meetings = StreamSupport.stream(races.spliterator(), false)
-                    .map(JsonElement::getAsJsonObject)
-                    .filter(race -> race.has("place"))
-                    .map(race -> race.get("place").getAsString())
-                    .collect(Collectors.toSet());
-
+            Set<String> meetings = Util.getMeetings(races);
             if (meetings.isEmpty()) {
                 return "No meetings found in the data.";
             }
-
             return "List of available meetings: " + meetings.stream().sorted().collect(Collectors.joining(", "));
         } catch (Exception e) {
             return "An error occurred while fetching meetings: " + e.getMessage();
@@ -217,20 +163,10 @@ public class RacesInfo {
         if (races == null) {
             return "Error: Race data is not available or in the expected format.";
         }
-
-        String result = StreamSupport.stream(races.spliterator(), false)
-                .map(JsonElement::getAsJsonObject)
-                .filter(race -> race.has("horses") && race.get("horses").isJsonArray()) // defensive check
-                .filter(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
-                        .map(JsonElement::getAsJsonObject)
-                        .anyMatch(horse -> horse.has("name") && horse.get("name").getAsString().equalsIgnoreCase(horseName)))
-                .map(race -> race.get("time").getAsString() + " at " + race.get("place").getAsString())
-                .collect(Collectors.joining(", "));
-
+        String result = Util.getResult(races, horseName);
         if (result.isEmpty()) {
             return "Could not find any races for horse: " + horseName;
         }
-
         return horseName + " is running in: " + result;
     }
 

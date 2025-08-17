@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.IntSummaryStatistics;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -127,6 +128,37 @@ public class Util {
                 .orElse(failureMessage);
     }
 
+    public static String findRaceWinPercentages(String time, String place, GCSReader gcsReader) {
+        // Local record for temporary data holding
+        record HorseRating(String name, int rating) {}
+
+        return Util.findRace(time, place, gcsReader)
+                .map(race -> {
+                    java.util.List<HorseRating> horseRatings = StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
+                            .map(JsonElement::getAsJsonObject)
+                            .map(horse -> {
+                                String horseName = horse.get("name").getAsString();
+                                if (!horse.has("past") || !horse.get("past").isJsonArray()) {
+                                    return new HorseRating(horseName, 0);
+                                }
+                                return new HorseRating(horseName, Util.getMaxRating(horse).orElse(0));
+                            })
+                            .collect(Collectors.toList());
+
+                    long totalRatingPool = horseRatings.stream().mapToLong(HorseRating::rating).sum();
+
+                    if (totalRatingPool == 0) {
+                        return "No rating data available to calculate win percentages for the race at " + place + " at " + time;
+                    }
+
+                    return "Win percentages for the " + time + " at " + place + ": " + horseRatings.stream()
+                            .sorted(Comparator.comparing(HorseRating::rating).reversed())
+                            .map(hr -> String.format("%s: %.2f%%", hr.name(), (hr.rating() / (double) totalRatingPool) * 100))
+                            .collect(Collectors.joining(", "));
+                })
+                .orElse("Could not find the race at " + place + " at " + time);
+    }
+
     public static String findBestMostRecentRatedHorse(String time, String place, GCSReader gcsReader) {
         // Local record for temporary data holding
         record HorseRecentRating(String name, int rating) {}
@@ -226,6 +258,31 @@ public class Util {
                 .findFirst();
     }
 
+    public static String getRunners(JsonObject race){
+        return StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
+                            .map(horse -> horse.getAsJsonObject().get("name").getAsString())
+                            .collect(Collectors.joining(", "));
+    }
+
+    public static Set<String> getMeetings(JsonArray races){
+        return StreamSupport.stream(races.spliterator(), false)
+                    .map(JsonElement::getAsJsonObject)
+                    .filter(race -> race.has("place"))
+                    .map(race -> race.get("place").getAsString())
+                    .collect(Collectors.toSet());
+    }
+
+    public static String getResult(JsonArray races, String horseName){
+        return StreamSupport.stream(races.spliterator(), false)
+                .map(JsonElement::getAsJsonObject)
+                .filter(race -> race.has("horses") && race.get("horses").isJsonArray()) // defensive check
+                .filter(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
+                        .map(JsonElement::getAsJsonObject)
+                        .anyMatch(horse -> horse.has("name") && horse.get("name").getAsString().equalsIgnoreCase(horseName)))
+                .map(race -> race.get("time").getAsString() + " at " + race.get("place").getAsString())
+                .collect(Collectors.joining(", "));
+    }
+
     public static Optional<JsonObject> getHorseOptional(JsonArray races, String horseName) {
         return StreamSupport.stream(races.spliterator(), false)
                 .map(JsonElement::getAsJsonObject)
@@ -247,6 +304,16 @@ public class Util {
                                 (String dateStr) -> LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("dd/MM/yyyy")))
                         .reversed())
                 .collect(Collectors.joining(", "));
+    }
+
+    public static String findAllRunners(String time, String place, GCSReader gcsReader) {
+        return Util.findRace(time, place, gcsReader)
+                .map(race -> {
+                    String runners = Util.getRunners(race);
+                    return runners.isEmpty() ? "No runners found for the race at " + place + " at " + time
+                            : "Runners for the " + time + " at " + place + ": " + runners;
+                })
+                .orElse("Could not find the race at " + place + " at " + time);
     }
 
 }
