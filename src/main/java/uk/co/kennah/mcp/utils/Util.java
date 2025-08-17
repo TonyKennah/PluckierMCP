@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.IntSummaryStatistics;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -122,7 +123,38 @@ public class Util {
                 .orElse(failureMessage);
     }
 
-    public static String findRaceWinPercentages(String time, String place, GCSReader gcsReader) {
+    public static String findRaceWinPercentagesFromLastThree(String time, String place, GCSReader gcsReader) {
+        // Local record for temporary data holding
+        record HorseRating(String name, int rating) {}
+
+        return Util.findRace(time, place, gcsReader)
+                .map(race -> {
+                    java.util.List<HorseRating> horseRatings = StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
+                            .map(JsonElement::getAsJsonObject)
+                            .map(horse -> {
+                                String horseName = horse.get("name").getAsString();
+                                if (!horse.has("past") || !horse.get("past").isJsonArray()) {
+                                    return new HorseRating(horseName, 0);
+                                }
+                                return new HorseRating(horseName, (int)Util.getAverageFromThreePastRating(horse).orElse(0));
+                            })
+                            .collect(Collectors.toList());
+
+                    long totalRatingPool = horseRatings.stream().mapToLong(HorseRating::rating).sum();
+
+                    if (totalRatingPool == 0) {
+                        return "No rating data available to calculate win percentages for the race at " + place + " at " + time;
+                    }
+
+                    return "Win percentages for the " + time + " at " + place + ": " + horseRatings.stream()
+                            .sorted(Comparator.comparing(HorseRating::rating).reversed())
+                            .map(hr -> String.format("%s: %.2f%%", hr.name(), (hr.rating() / (double) totalRatingPool) * 100))
+                            .collect(Collectors.joining(", "));
+                })
+                .orElse("Could not find the race at " + place + " at " + time);
+    }
+
+    public static String findRaceWinPercentagesFromBestEver(String time, String place, GCSReader gcsReader) {
         // Local record for temporary data holding
         record HorseRating(String name, int rating) {}
 
@@ -235,6 +267,15 @@ public class Util {
                                     .map(JsonElement::getAsJsonObject)
                                     .filter(form -> form.has("date") && form.get("date").isJsonPrimitive())
                                     .max(Comparator.comparing(form -> LocalDate.parse(form.get("date").getAsString(), DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
+    }
+
+    public static OptionalDouble getAverageFromThreePastRating(JsonObject horse){
+        return StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
+                                        .map(JsonElement::getAsJsonObject)
+                                        .limit(3)
+                                        .filter(form -> form.has("name") && form.get("name").isJsonPrimitive())
+                                        .mapToInt(form -> form.get("name").getAsInt())
+                                        .average();
     }
 
     public static OptionalInt getMaxRating(JsonObject horse){

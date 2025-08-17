@@ -53,10 +53,16 @@ public class RacesInfoController {
         return racesInfo.getBestMostRecentRated(time, place);
     }
 
-    @GetMapping("/race-win-percentages")
-    public String getRaceWinPercentages(@RequestParam String time, @RequestParam String place) {
-        logger.info("REST request for race win percentages in the {} at {}", time, place);
-        return racesInfo.getRaceWinPercentages(time, place);
+    @GetMapping("/race-win-percentages-from-best-ever")
+    public String getRaceWinPercentagesFromBestEver(@RequestParam String time, @RequestParam String place) {
+        logger.info("REST request for race win percentages for best ever performance in the {} at {}", time, place);
+        return racesInfo.getRaceWinPercentagesFromBestEver(time, place);
+    }
+
+    @GetMapping("/race-win-percentages-from-last-three")
+    public String getRaceWinPercentagesFromLastThree(@RequestParam String time, @RequestParam String place) {
+        logger.info("REST request for race win percentages for last three runs in the {} at {}", time, place);
+        return racesInfo.getRaceWinPercentagesFromLastThree(time, place);
     }
 
     @GetMapping("/all-runners") //works

@@ -98,10 +98,16 @@ public class RacesInfo {
         return Util.findBestMostRecentRatedHorse(time, place, gcsReader);
     }
 
-    @Tool(name = "get_race_win_percentages", description = "Calculates the win percentage for each horse in a race based on their best-ever rating.")
-    public String getRaceWinPercentages(String time, String place) {
-        logger.info("AI tool call for race win percentages in the {} at {}", time, place);
-        return Util.findRaceWinPercentages(time, place, gcsReader);
+    @Tool(name = "get_race_win_percentages_from_last_three", description = "Calculates the win percentage for each horse in a race based on their average over the last three runs.")
+    public String getRaceWinPercentagesFromLastThree(String time, String place) {
+        logger.info("AI tool call for race win percentages from last three runs in the {} at {}", time, place);
+        return Util.findRaceWinPercentagesFromLastThree(time, place, gcsReader);
+    }
+
+    @Tool(name = "get_race_win_percentages_from_best_ever", description = "Calculates the win percentage for each horse in a race based on their best-ever rating.")
+    public String getRaceWinPercentagesFromBestEver(String time, String place) {
+        logger.info("AI tool call for race win percentages from best ever performance in the {} at {}", time, place);
+        return Util.findRaceWinPercentagesFromBestEver(time, place, gcsReader);
     }
 
     @Tool(name = "get_all_runners", description = "Get all the runners for a particular race, identified by its time and place.")
