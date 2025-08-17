@@ -21,7 +21,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(properties = {"spring.cache.type=none"})
+@SpringBootTest(properties = {
+		"spring.autoconfigure.exclude=com.google.cloud.spring.autoconfigure.storage.GcpStorageAutoConfiguration",
+		"spring.cache.type=none"
+})
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class McpServerApplicationTests {
@@ -79,7 +82,8 @@ class McpServerApplicationTests {
 		String mockJsonData = """
             [
               {"time": "14:05", "place": "Ascot", "detail": "(CLASS 4) (3yo+)", "horses": [
-                  {"name": "GoodHorse", "past": [{"date": "01/01/2023", "name": 100}, {"date": "02/01/2023", "name": 100}, {"date": "03/01/2023", "name": 100}]},
+                  {"name": "GoodHorse", "past": [{"date": "02/01/2023", "name": 100}, {"date": "03/01/2023", "name": 100}, {"date": "01/01/2023", "name": 100}]},
+                  {"name": "NoFormHorse", "past": []},
                   {"name": "BadHorse", "past": [{"date": "01/01/2023", "name": 50}, {"date": "02/01/2023", "name": 50}, {"date": "03/01/2023", "name": 50}]}
               ]},
               {"time": "15:00", "place": "York", "detail": "(CLASS 5) (4yo+)", "horses": [

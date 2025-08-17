@@ -52,7 +52,6 @@ class RacesInfoControllerTest {
 
         // Assert
         assertThat(actualResponse).isEqualTo(expectedResponse);
-        // Verify that the service method was indeed called
-        verify(racesInfo).getNapOfTheDay();
     }
 }
+

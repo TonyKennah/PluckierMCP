@@ -10,6 +10,7 @@ import java.util.IntSummaryStatistics;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -57,6 +58,23 @@ public class RacesInfo {
                 .findFirst();
     }
 
+    private double calculateAverageRating(JsonObject horse, Optional<Integer> limit) {
+        if (!horse.has("past") || !horse.get("past").isJsonArray()) {
+            return -1;
+        }
+        var pastStream = StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
+                .map(JsonElement::getAsJsonObject);
+
+        var limitedStream = limit.map(pastStream::limit).orElse(pastStream);
+
+        IntSummaryStatistics stats = limitedStream
+                .filter(form -> form.has("name") && form.get("name").isJsonPrimitive())
+                .mapToInt(form -> form.get("name").getAsInt())
+                .summaryStatistics();
+        
+        return stats.getCount() > 0 ? stats.getAverage() : -1;
+    }
+
 
     @Tool(name = "get_best_ever_rated", description = "Get the best rated horse for a particular race, identified by its time and place. This is the highest single rating from any past race.")
     public String getBestEverRated(String time, String place) {
@@ -87,18 +105,10 @@ public class RacesInfo {
         return findRace(time, place)
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                         .map(JsonElement::getAsJsonObject)
-                        .map(horse -> {
-                            if (!horse.has("past") || !horse.get("past").isJsonArray()) {
-                                return new HorseAverageRating(horse.get("name").getAsString(), -1);
-                            }
-                            IntSummaryStatistics stats = StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
-                                    .map(JsonElement::getAsJsonObject)
-                                    .limit(3)
-                                    .filter(form -> form.has("name") && form.get("name").isJsonPrimitive())
-                                    .mapToInt(form -> form.get("name").getAsInt())
-                                    .summaryStatistics();
-                            return new HorseAverageRating(horse.get("name").getAsString(), stats.getCount() > 0 ? stats.getAverage() : -1);
-                        })
+                        .map(horse -> new HorseAverageRating(
+                                horse.get("name").getAsString(),
+                                calculateAverageRating(horse, Optional.of(3))
+                        ))
                         .filter(h -> h.average() >= 0)
                         .max(Comparator.comparingDouble(HorseAverageRating::average))
                         .map(top -> "Horse with best last 3 run average rating for the " + time + " at " + place + " is: " + top.name()
@@ -116,22 +126,14 @@ public class RacesInfo {
         return findRace(time, place)
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                         .map(JsonElement::getAsJsonObject)
-                        .map(horse -> {
-                            if (!horse.has("past") || !horse.get("past").isJsonArray()) {
-                                return new HorseAverageRating(horse.get("name").getAsString(), -1);
-                            }
-                            IntSummaryStatistics stats = StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
-                                    .map(JsonElement::getAsJsonObject)
-                                    .limit(3)
-                                    .filter(form -> form.has("name") && form.get("name").isJsonPrimitive())
-                                    .mapToInt(form -> form.get("name").getAsInt())
-                                    .summaryStatistics();
-                            return new HorseAverageRating(horse.get("name").getAsString(), stats.getCount() > 0 ? stats.getAverage() : -1);
-                        })
+                        .map(horse -> new HorseAverageRating(
+                                horse.get("name").getAsString(),
+                                calculateAverageRating(horse, Optional.of(3))
+                        ))
                         .filter(h -> h.average() >= 0)
                         .min(Comparator.comparingDouble(HorseAverageRating::average))
-                        .map(top -> "Horse with worst last 3 run average rating for the " + time + " at " + place + " is: " + top.name()
-                                + " with an average rating of " + String.format("%.2f", top.average()))
+                        .map(bottom -> "Horse with worst last 3 run average rating for the " + time + " at " + place + " is: " + bottom.name()
+                                + " with an average rating of " + String.format("%.2f", bottom.average()))
                         .orElse("No horses with a recent average rating found for the race at " + place + " at " + time))
                 .orElse("Could not find the race at " + place + " at " + time);
     }
@@ -145,17 +147,10 @@ public class RacesInfo {
         return findRace(time, place)
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                         .map(JsonElement::getAsJsonObject)
-                        .map(horse -> {
-                            if (!horse.has("past") || !horse.get("past").isJsonArray()) {
-                                return new HorseAverageRating(horse.get("name").getAsString(), -1);
-                            }
-                            IntSummaryStatistics stats = StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
-                                    .map(JsonElement::getAsJsonObject)
-                                    .filter(form -> form.has("name") && form.get("name").isJsonPrimitive())
-                                    .mapToInt(form -> form.get("name").getAsInt())
-                                    .summaryStatistics();
-                            return new HorseAverageRating(horse.get("name").getAsString(), stats.getCount() > 0 ? stats.getAverage() : -1);
-                        })
+                        .map(horse -> new HorseAverageRating(
+                                horse.get("name").getAsString(),
+                                calculateAverageRating(horse, Optional.empty())
+                        ))
                         .filter(h -> h.average() >= 0)
                         .max(Comparator.comparingDouble(HorseAverageRating::average))
                         .map(top -> "Horse with best average rating for the " + time + " at " + place + " is: " + top.name()
@@ -417,9 +412,7 @@ public class RacesInfo {
         return "Form for " + horseName + ": " + formDetails;
     }
 
-    @Tool(name = "get_nap_of_the_day", description = "Find the best bet of the day across all races, based on the highest average rating over the last 3 runs.")
-    public String getNapOfTheDay() {
-        logger.info("AI tool call for Nap of the Day");
+    private String findNap(Predicate<JsonObject> raceFilter, String successMessage, String failureMessage) {
         JsonArray races = getCachedRaceData();
         if (races == null) {
             return "Error: Race data is not available or in the expected format.";
@@ -431,22 +424,14 @@ public class RacesInfo {
         Optional<NapCandidate> bestBet = StreamSupport.stream(races.spliterator(), false)
                 .map(JsonElement::getAsJsonObject)
                 .filter(race -> race.has("horses") && race.get("horses").isJsonArray())
+                .filter(raceFilter) // Apply the specific filter
                 .flatMap(race -> {
                     String time = race.get("time").getAsString();
                     String place = race.get("place").getAsString();
                     return StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                             .map(JsonElement::getAsJsonObject)
                             .map(horse -> {
-                                if (!horse.has("past") || !horse.get("past").isJsonArray()) {
-                                    return new NapCandidate(horse.get("name").getAsString(), time, place, -1);
-                                }
-                                IntSummaryStatistics stats = StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
-                                        .map(JsonElement::getAsJsonObject)
-                                        .limit(3)
-                                        .filter(form -> form.has("name") && form.get("name").isJsonPrimitive())
-                                        .mapToInt(form -> form.get("name").getAsInt())
-                                        .summaryStatistics();
-                                double average = stats.getCount() > 0 ? stats.getAverage() : -1;
+                                double average = calculateAverageRating(horse, Optional.of(3));
                                 return new NapCandidate(horse.get("name").getAsString(), time, place, average);
                             });
                 })
@@ -454,53 +439,45 @@ public class RacesInfo {
                 .max(Comparator.comparingDouble(NapCandidate::averageRating));
 
         return bestBet
-                .map(nap -> String.format("The nap of the day is %s in the %s at %s, with a recent average rating of %.2f.",
+                .map(nap -> String.format(successMessage,
                         nap.horseName(), nap.time(), nap.place(), nap.averageRating()))
-                .orElse("Could not determine a nap of the day from the available data.");
+                .orElse(failureMessage);
+    }
+
+    @Tool(name = "get_nap_of_the_day", description = "Find the best bet of the day across all races, based on the highest average rating over the last 3 runs.")
+    public String getNapOfTheDay() {
+        logger.info("AI tool call for Nap of the Day");
+        return findNap(
+                race -> true, // No filter, include all races
+                "The nap of the day is %s in the %s at %s, with a recent average rating of %.2f.",
+                "Could not determine a nap of the day from the available data.");
     }
 
     @Tool(name = "get_handicap_nap_of_the_day", description = "Find the best bet of the day from handicap races only, based on the highest average rating over the last 3 runs.")
     public String getHandicapNapOfTheDay() {
         logger.info("AI tool call for Handicap Nap of the Day");
-        JsonArray races = getCachedRaceData();
-        if (races == null) {
-            return "Error: Race data is not available or in the expected format.";
-        }
+        Predicate<JsonObject> handicapFilter = race -> race.has("detail")
+                && race.get("detail").getAsString().toLowerCase().contains("handicap");
 
-        // Local record for holding candidate horses
-        record NapCandidate(String horseName, String time, String place, double averageRating) {}
+        return findNap(
+                handicapFilter,
+                "The handicap nap of the day is %s in the %s at %s, with a recent average rating of %.2f.",
+                "Could not determine a nap of the day from today's handicap races.");
+    }
 
-        Optional<NapCandidate> bestBet = StreamSupport.stream(races.spliterator(), false)
-                .map(JsonElement::getAsJsonObject)
-                .filter(race -> race.has("horses") && race.get("horses").isJsonArray())
-                // Filter for Handicap races only. Detail contains handicap.
-                .filter(race -> race.has("detail") && race.get("detail").getAsString().toLowerCase().contains("handicap"))
-                .flatMap(race -> {
-                    String time = race.get("time").getAsString();
-                    String place = race.get("place").getAsString();
-                    return StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
-                            .map(JsonElement::getAsJsonObject)
-                            .map(horse -> {
-                                if (!horse.has("past") || !horse.get("past").isJsonArray()) {
-                                    return new NapCandidate(horse.get("name").getAsString(), time, place, -1);
-                                }
-                                IntSummaryStatistics stats = StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
-                                        .map(JsonElement::getAsJsonObject)
-                                        .limit(3)
-                                        .filter(form -> form.has("name") && form.get("name").isJsonPrimitive())
-                                        .mapToInt(form -> form.get("name").getAsInt())
-                                        .summaryStatistics();
-                                double average = stats.getCount() > 0 ? stats.getAverage() : -1;
-                                return new NapCandidate(horse.get("name").getAsString(), time, place, average);
-                            });
-                })
-                .filter(candidate -> candidate.averageRating() >= 0)
-                .max(Comparator.comparingDouble(NapCandidate::averageRating));
+    @Tool(name = "get_uk_handicap_nap_of_the_day", description = "Find the best bet of the day from UK handicap races only, based on the highest average rating over the last 3 runs.")
+    public String getUkHandicapNapOfTheDay() {
+        logger.info("AI tool call for UK Handicap Nap of the Day");
+        Predicate<JsonObject> ukHandicapFilter = race -> {
+            boolean isHandicap = race.has("detail") && race.get("detail").getAsString().toLowerCase().contains("handicap");
+            boolean isUk = race.has("country") && "UK".equalsIgnoreCase(race.get("country").getAsString());
+            return isHandicap && isUk;
+        };
 
-        return bestBet
-                .map(nap -> String.format("The handicap nap of the day is %s in the %s at %s, with a recent average rating of %.2f.",
-                        nap.horseName(), nap.time(), nap.place(), nap.averageRating()))
-                .orElse("Could not determine a nap of the day from today's handicap races.");
+        return findNap(
+                ukHandicapFilter,
+                "The UK handicap nap of the day is %s in the %s at %s, with a recent average rating of %.2f.",
+                "Could not determine a nap of the day from today's UK handicap races.");
     }
     
 }

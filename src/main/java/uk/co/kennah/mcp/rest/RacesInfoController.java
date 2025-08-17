@@ -100,4 +100,16 @@ public class RacesInfoController {
         logger.info("REST request received for Nap of the Day");
         return racesInfo.getNapOfTheDay();
     }
+
+    @GetMapping("/nap-of-the-day-handicap")
+    public String getHandicapNapOfTheDay() {
+        logger.info("REST request received for Nap of the Day handicap races only");
+        return racesInfo.getHandicapNapOfTheDay();
+    }
+
+    @GetMapping("/nap-of-the-day-uk-handicap")
+    public String getUkHandicapNapOfTheDay() {
+        logger.info("REST request received for Nap of the Day UK handicap races only");
+        return racesInfo.getUkHandicapNapOfTheDay();
+    }
 }
