@@ -21,7 +21,7 @@ Simple enough code but it's all about the information, right?
 
 *   Java Development Kit (JDK) 17 or later.
 *   Apache Maven.
-*   Access to the specific GCP Cloud storage location, with access credentials stored in the environment:  GOOGLE_APPLICATION_CREDENTIALS
+*   ⚠️ Access to the specific GCP Cloud storage location, with access credentials stored in the environment:  GOOGLE_APPLICATION_CREDENTIALS
 
 ## Building & Running the Project
 
