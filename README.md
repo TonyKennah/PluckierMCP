@@ -82,3 +82,7 @@ The application provides a real-time log viewer to monitor server activity. This
 
 <img width="474" height="503" alt="image" src="https://github.com/user-attachments/assets/9e31b882-2438-403c-a313-6b957dea07dc" />
 
+Example:
+
+![Example](gemini.jpg "Gemini using pluckier")
+
