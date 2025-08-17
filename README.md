@@ -61,7 +61,10 @@ Or a java command:
 ./java -jar target/mcp-server-0.0.1-SNAPSHOT.jar
 ```
 
-The server will start on `http://localhost:8080`.
+The server will start on `http://localhost:8080` which shows links to the log viewer and exposes the parameterised REST endpoints.
+
+<img width="1236" height="1046" alt="image" src="https://github.com/user-attachments/assets/6d1f222c-7a53-46d5-afd7-0a4319352dc2" />
+
 
 ### Live Log Viewer
 
