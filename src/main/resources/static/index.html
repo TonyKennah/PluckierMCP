@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pluckier MCP - Home</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1e1e1e; color: #d4d4d4; margin: 0; padding: 2em; }
+        h2, h3 { color: #4ec9b0; border-bottom: 1px solid #444; padding-bottom: 5px; }
+        #container {
+            background-color: #252526;
+            border: 1px solid #3c3c3c;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        ul { list-style-type: none; padding: 0; }
+        li { margin-bottom: 10px; font-family: 'Courier New', Courier, monospace; }
+        a { color: #9cdcfe; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        code { background-color: #333; padding: 2px 5px; border-radius: 3px; }
+        .input-container {
+            display: flex;
+            gap: 20px; /* Spacing between input groups */
+            margin-bottom: 20px;
+        }
+        .input-group { /* No specific styling needed here anymore for layout */ }
+        label { display: inline-block; margin-right: 10px; margin-bottom: 5px; color: #ccc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        input[type="text"] {
+            background-color: #3c3c3c;
+            color: #d4d4d4;
+            border: 1px solid #555;
+            padding: 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h2>Pluckier MCP - Main Page</h2>
+        
+        <h3>Live Viewer</h3>
+        <ul>
+            <li><a href="/logs.html" target="_blank">/logs.html</a></li>
+        </ul>
+
+        <h3>Static API Endpoints</h3>
+        <ul>
+            <li><a href="/nap-of-the-day" target="_blank">/nap-of-the-day</a></li>
+            <li><a href="/nap-of-the-day-handicap" target="_blank">/nap-of-the-day-handicap</a></li>
+            <li><a href="/nap-of-the-day-uk-handicap" target="_blank">/nap-of-the-day-uk-handicap</a></li>
+            <li><a href="/next-race" target="_blank">/next-race</a></li>
+            <li><a href="/meetings" target="_blank">/meetings</a></li>
+        </ul>
+
+        <h3>Interactive API Endpoints</h3>
+
+        <div class="input-container">
+            <div class="input-group">
+                <label for="placeInput">Place:</label>
+                <input type="text" id="placeInput" placeholder="e.g., Newmarket">
+            </div>
+            <div class="input-group">
+                <label for="timeInput">Time (HH:mm):</label>
+                <input type="text" id="timeInput" placeholder="e.g., 13:50">
+            </div>
+            <div class="input-group">
+                <label for="horseNameInput">Horse Name:</label>
+                <input type="text" id="horseNameInput" placeholder="e.g., Native Trail">
+            </div>
+        </div>
+
+        <h4>By Place</h4>
+        <ul>
+            <li><a href="#" id="allTimesLink" target="_blank">/all-times</a></li>
+        </ul>
+
+        <h4>By Time & Place</h4>
+        <ul>
+            <li><a href="#" id="topRatedLink" target="_blank">/top-rated</a></li>
+            <li><a href="#" id="bottomRatedLink" target="_blank">/bottom-rated</a></li>
+            <li><a href="#" id="bestAverageRatedLink" target="_blank">/best-average-rated</a></li>
+            <li><a href="#" id="bestEverRatedLink" target="_blank">/best-ever-rated</a></li>
+            <li><a href="#" id="bestMostRecentRatedLink" target="_blank">/best-most-recent-rated</a></li>
+            <li><a href="#" id="raceWinPercentagesLink" target="_blank">/race-win-percentages</a></li>
+            <li><a href="#" id="allRunnersLink" target="_blank">/all-runners</a></li>
+        </ul>
+
+        <h4>By Horse Name</h4>
+        <ul>
+            <li><a href="#" id="pastRunDatesLink" target="_blank">/past-run-dates</a></li>
+            <li><a href="#" id="findHorseRaceLink" target="_blank">/find-horse-race</a></li>
+        </ul>
+
+        <h4>By Time, Place & Horse Name</h4>
+        <ul>
+            <li><a href="#" id="horseFormLink" target="_blank">/horse-form</a></li>
+        </ul>
+    </div>
+
+    <script>
+        (function() {
+            const placeInput = document.getElementById('placeInput');
+            const timeInput = document.getElementById('timeInput');
+            const horseNameInput = document.getElementById('horseNameInput');
+
+            function updateLinks() {
+                const place = encodeURIComponent(placeInput.value);
+                const time = encodeURIComponent(timeInput.value);
+                const horseName = encodeURIComponent(horseNameInput.value);
+
+                document.getElementById('allTimesLink').href = `/all-times?place=${place}`;
+                
+                const timeAndPlaceParams = `?time=${time}&place=${place}`;
+                document.getElementById('topRatedLink').href = '/top-rated' + timeAndPlaceParams;
+                document.getElementById('bottomRatedLink').href = '/bottom-rated' + timeAndPlaceParams;
+                document.getElementById('bestAverageRatedLink').href = '/best-average-rated' + timeAndPlaceParams;
+                document.getElementById('bestEverRatedLink').href = '/best-ever-rated' + timeAndPlaceParams;
+                document.getElementById('bestMostRecentRatedLink').href = '/best-most-recent-rated' + timeAndPlaceParams;
+                document.getElementById('raceWinPercentagesLink').href = '/race-win-percentages' + timeAndPlaceParams;
+                document.getElementById('allRunnersLink').href = '/all-runners' + timeAndPlaceParams;
+
+                document.getElementById('pastRunDatesLink').href = `/past-run-dates?horseName=${horseName}`;
+                document.getElementById('findHorseRaceLink').href = `/find-horse-race?horseName=${horseName}`;
+
+                document.getElementById('horseFormLink').href = `/horse-form?time=${time}&place=${place}&horseName=${horseName}`;
+            }
+
+            placeInput.addEventListener('input', updateLinks);
+            timeInput.addEventListener('input', updateLinks);
+            horseNameInput.addEventListener('input', updateLinks);
+
+            updateLinks();
+        })();
+    </script>
+</body>
+</html>

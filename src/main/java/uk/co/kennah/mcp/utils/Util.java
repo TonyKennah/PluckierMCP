@@ -21,13 +21,7 @@ import uk.co.kennah.mcp.gcp.GCSReader;
 
 public class Util {
     // Local record for temporary data holding
-    private record HorseAverageRating(String name, double average) {
-    }
-
-    public static String formatTime(String time) {
-        // Assuming time is in HH:mm format
-        return time.replace(":", "");
-    }
+    private record HorseAverageRating(String name, double average) {}
 
     public static JsonArray getCachedRaceData(GCSReader gcsReader) {
         JsonElement jsonElement = gcsReader.readFileFromGCSAsJson();
