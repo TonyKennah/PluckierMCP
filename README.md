@@ -6,15 +6,12 @@
 
 ![Example](gemini.jpg "Gemini using pluckier")
 
-# Communication Viewer
-<img width="1803" height="605" alt="image" src="https://github.com/user-attachments/assets/6180d2db-c894-4e1b-ab51-65b0b7b58d9a" />
-
 # Pluckier MCP
-This is a Spring Boot application that provides information about horse races and interacts with Google Cloud Storage. It uses Spring AI to expose tool functions for an AI agent and exposes a REST endpoint `/info` to retrieve race information from a JSON file stored in a GCS bucket.
+This is a Spring Boot application that provides information about horse races.  It uses Spring AI to expose tool functions for an AI agent and REST endpoints to retrieve race information in JSON format stored in a GCS bucket.
 
 ## Technology Stack
 
-Simple code but all about the information.
+Simple enough code but it's all about the information, right?
 
 *   Spring Framework
 *   Java 17
@@ -27,48 +24,46 @@ Simple code but all about the information.
 
 *   Java Development Kit (JDK) 17 or later.
 *   Apache Maven.
-*   Access to Google Cloud Storage. You must be authenticated, for example by running `gcloud auth application-default login`.
 
-## Configuration
-
-The application is configured via `src/main/resources/application.properties`. You must provide the following properties for it to connect to Google Cloud Storage:
-
-*   `gcs.bucket.name`: The name of your GCS bucket.
-*   `gcs.file.name`: The name of the JSON file within the bucket.
-
-Example `application.properties`:
-```properties
-gcs.bucket.name=your-gcs-bucket
-gcs.file.name=your-race-data.json
-```
-
-## Building the Project
+## Building & Running the Project
 
 You can build the project using the Maven wrapper:
 
 ```sh
-./mvnw clean install
+./mvn clean install
 ```
 
 ## Running the Application
 
-To run the application, use the Spring Boot Maven plugin:
+Generally you run the server via an AI agent such as Gemini Cli.  Via a Java command within Gemini settings.json file.
+```
+{
+    "mcpServers": {
+        "pluckier": {
+            "command": "java",
+            "args": [
+	            "-Dspring.ai.mcp.server.stdio=true",
+                "-jar",
+                "<PATH_TO>target\\mcp-server-0.0.1-SNAPSHOT.jar"
+            ]
+        }
+    }
+}
+```    
+
+To run the application manually, use the Spring Boot Maven plugin:
 
 ```sh
-./mvnw spring-boot:run
+./mvn spring-boot:run
+```
+
+Or a java command:
+
+```sh
+./java -jar target/mcp-server-0.0.1-SNAPSHOT.jar
 ```
 
 The server will start on `http://localhost:8080`.
-
-How It All Connects
-- The logs.html frontend connects to the server at the /ws endpoint.
-- The frontend then subscribes to the /topic/logs channel.
-On the server, the WebSocketLogAppender intercepts a log message.
-- The appender sends that message to the /topic/logs destination.
-- The message broker, configured by this class, receives the message and broadcasts it to all clients subscribed to /topic/logs.
-
-
-## Usage
 
 ### Live Log Viewer
 
@@ -80,6 +75,8 @@ The application provides a real-time log viewer to monitor server activity. This
     http://localhost:8080/logs.html
     ```
 3.  The page will automatically connect to the server's WebSocket endpoint and display log messages as they are generated.
+
+<img width="1803" height="605" alt="image" src="https://github.com/user-attachments/assets/6180d2db-c894-4e1b-ab51-65b0b7b58d9a" />
 
 ---
 
