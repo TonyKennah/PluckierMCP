@@ -1,62 +1,30 @@
 package uk.co.kennah.mcp;
 
-import com.google.cloud.storage.Storage;
 import com.google.gson.JsonParser;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.co.kennah.mcp.gcp.GCSReader;
-import uk.co.kennah.mcp.rest.RacesInfoController;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(properties = {
-		"spring.autoconfigure.exclude=com.google.cloud.spring.autoconfigure.storage.GcpStorageAutoConfiguration",
 		"spring.cache.type=none"
 })
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
 class McpServerApplicationTests {
-
-	@TestConfiguration
-	static class McpServerTestConfiguration {
-		@Bean
-		@Primary
-		public GCSReader gcsReader() {
-			return Mockito.mock(GCSReader.class);
-		}
-
-		@Bean
-		@Primary // Mock the Storage bean to prevent GCS connection and satisfy dependency
-		public Storage storage() {
-			return Mockito.mock(Storage.class);
-		}
-	}
 
 	@Autowired
 	private MockMvc mockMvc;
 
-	@Autowired
-	private RacesInfoController controller;
-
-	@Autowired
+	@MockBean
 	private GCSReader gcsReader;
-
-	@Test
-	void contextLoads() {
-		assertThat(controller).isNotNull();
-	}
 
 	@Test
 	void getMeetingsEndpointShouldReturnMeetingList() throws Exception {
