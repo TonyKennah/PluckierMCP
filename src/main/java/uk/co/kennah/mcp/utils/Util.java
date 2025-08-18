@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import uk.co.kennah.mcp.gcp.GCSHorseReader;
+import uk.co.kennah.mcp.gcp.GCSOddsReader;
 
 public class Util {
     // Local record for temporary data holding
@@ -33,6 +34,24 @@ public class Util {
         }
         return jsonElement.getAsJsonArray();
     }
+
+    public static JsonArray getCachedOddsData(GCSOddsReader gcsReader) {
+        JsonElement jsonElement = gcsReader.readOddsFileFromGCSAsJson();
+        if (jsonElement == null || !jsonElement.isJsonArray()) {
+            // This case will be handled by the calling methods if they receive null.
+            return null;
+        }
+        return jsonElement.getAsJsonArray();
+    }
+
+    public static Set<String> getOdds(JsonArray odds, String time, String place) {
+        return StreamSupport.stream(odds.spliterator(), false)
+                .map(JsonElement::getAsJsonObject)
+                .filter(det -> det.get("event").getAsString().contains(time) && det.get("event").getAsString().contains(place))
+                .map(det -> det.get("name").getAsString() + " " + det.get("odds").getAsString())
+                .collect(Collectors.toSet());  
+    }
+        
 
     public static Optional<JsonObject> findRace(String time, String place, GCSHorseReader gcsReader) {
         JsonArray races = getCachedRaceData(gcsReader);
@@ -309,12 +328,6 @@ public class Util {
                             .collect(Collectors.joining(", "));
     }
 
-    public static String getRunnersWithOdds(JsonObject race){
-        return StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
-                            .map(horse -> horse.getAsJsonObject().get("name").getAsString()) //+ " " + horse.getAsJsonObject().get("odds").getAsString())
-                            .collect(Collectors.joining(", "));
-    }
-
     public static Set<String> getMeetings(JsonArray races){
         return StreamSupport.stream(races.spliterator(), false)
                     .map(JsonElement::getAsJsonObject)
@@ -363,16 +376,6 @@ public class Util {
                     String runners = Util.getRunners(race);
                     return runners.isEmpty() ? "No runners found for the race at " + place + " at " + time
                             : "Runners for the " + time + " at " + place + ": " + runners;
-                })
-                .orElse("Could not find the race at " + place + " at " + time);
-    }
-
-    public static String findAllRunnersWithOdds(String time, String place, GCSHorseReader gcsReader) {
-        return Util.findRace(time, place, gcsReader)
-                .map(race -> {
-                    String runnersWithOdds = Util.getRunnersWithOdds(race);
-                    return runnersWithOdds.isEmpty() ? "No runners found for the race at " + place + " at " + time
-                            : "Runners and odds for the " + time + " at " + place + ": " + runnersWithOdds;
                 })
                 .orElse("Could not find the race at " + place + " at " + time);
     }

@@ -23,6 +23,12 @@ public class RacesInfoController {
         return racesInfo.getMeetings();
     }
 
+    @GetMapping("/odds") //works
+    public String getOdds(@RequestParam String time, @RequestParam String place) {
+        logger.info("REST request received for all the odds");
+        return racesInfo.getOdds(time, place);
+    }
+
     @GetMapping("/top-rated")
     public String getTopRated(@RequestParam String time, @RequestParam String place) {
         logger.info("REST request for top rated horse in the {} at {}", time, place);
@@ -81,12 +87,6 @@ public class RacesInfoController {
     public String getAllRunners(@RequestParam String time, @RequestParam String place) {
         logger.info("REST request for all runners in the {} at {}", time, place);
         return racesInfo.getAllRunners(time, place);
-    }
-
-    @GetMapping("/all-runners-with-odds") //works
-    public String getAllRunnersWithOdds(@RequestParam String time, @RequestParam String place) {
-        logger.info("REST request for all runners with odds in the {} at {}", time, place);
-        return racesInfo.getAllRunnersWithOdds(time, place);
     }
 
     @GetMapping("/all-times") //works

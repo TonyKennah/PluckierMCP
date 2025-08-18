@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.co.kennah.mcp.gcp.GCSHorseReader;
+import uk.co.kennah.mcp.gcp.GCSOddsReader;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -25,6 +26,9 @@ class McpServerApplicationTests {
 
 	@MockBean
 	private GCSHorseReader gcsReader;
+
+	@MockBean
+	private GCSOddsReader gcsOddsReader;
 
 	@Test
 	void getMeetingsEndpointShouldReturnMeetingList() throws Exception {

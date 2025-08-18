@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import uk.co.kennah.mcp.gcp.GCSHorseReader;
+import uk.co.kennah.mcp.gcp.GCSOddsReader;
 import uk.co.kennah.mcp.utils.Util;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Service;
@@ -22,8 +23,31 @@ public class RacesInfo {
     @Autowired
     private GCSHorseReader gcsReader;
 
+    @Autowired
+    private GCSOddsReader gcsOddsReader;
+
     private JsonArray getCachedRaceData() {
         return Util.getCachedRaceData(gcsReader);
+    }
+
+    private JsonArray getCachedOddsData() {
+        return Util.getCachedOddsData(gcsOddsReader);
+    }
+
+    @Tool(name = "get_odds", description = "Retrieve all odds for a race.")
+    public String getOdds(String time, String place) {
+        logger.info("AI tool call for all odds");
+        try {
+            JsonArray odds = getCachedOddsData();
+            if (odds == null) return "Error: Odds data is not in the expected format.";
+            Set<String> allOdds = Util.getOdds(odds, time, place);
+            if (allOdds.isEmpty()) {
+                return "No Odds found in the data.";
+            }
+            return "Runners and odds for " + time + " at " + place + ": " + allOdds.stream().sorted().collect(Collectors.joining(", "));
+        } catch (Exception e) {
+            return "An error occurred while fetching odds: " + e.getMessage();
+        }
     }
 
     @Tool(name = "get_nap_of_the_day", description = "Find the best bet of the day across all races, based on the highest average rating over the last 3 runs.")
@@ -126,12 +150,6 @@ public class RacesInfo {
     public String getAllRunners(String time, String place) {
         logger.info("AI tool call for all runners in the {} at {}", time, place);
         return Util.findAllRunners(time, place, gcsReader);
-    }
-
-    @Tool(name = "get_all_runners_with_odds", description = "Get all the runners for a particular race with their current odds, identified by its time and place.")
-    public String getAllRunnersWithOdds(String time, String place) {
-        logger.info("AI tool call for all runners with odds in the {} at {}", time, place);
-        return Util.findAllRunnersWithOdds(time, place, gcsReader);
     }
 
     @Tool(name = "get_past_run_dates", description = "Get all the past race dates for a given horse name.")
