@@ -98,6 +98,12 @@ public class RacesInfo {
         return Util.findBestMostRecentRatedHorse(time, place, gcsReader);
     }
 
+    @Tool(name = "get_race_win_percentages_from_last_one", description = "Calculates the win percentage for each horse in a race based on their last run.")
+    public String getRaceWinPercentagesFromLastOne(String time, String place) {
+        logger.info("AI tool call for race win percentages from last run in the {} at {}", time, place);
+        return Util.findRaceWinPercentagesFromLastOne(time, place, gcsReader);
+    }
+
     @Tool(name = "get_race_win_percentages_from_last_three", description = "Calculates the win percentage for each horse in a race based on their average over the last three runs.")
     public String getRaceWinPercentagesFromLastThree(String time, String place) {
         logger.info("AI tool call for race win percentages from last three runs in the {} at {}", time, place);
@@ -110,10 +116,22 @@ public class RacesInfo {
         return Util.findRaceWinPercentagesFromBestEver(time, place, gcsReader);
     }
 
+    @Tool(name = "get_race_win_percentages_from_all", description = "Calculates the win percentage for each horse in a race based on all their past ratings.")
+    public String getRaceWinPercentagesFromAll(String time, String place) {
+        logger.info("AI tool call for race win percentages from all past performance in the {} at {}", time, place);
+        return Util.findRaceWinPercentagesFromAll(time, place, gcsReader);
+    }
+
     @Tool(name = "get_all_runners", description = "Get all the runners for a particular race, identified by its time and place.")
     public String getAllRunners(String time, String place) {
         logger.info("AI tool call for all runners in the {} at {}", time, place);
         return Util.findAllRunners(time, place, gcsReader);
+    }
+
+    @Tool(name = "get_all_runners_with_odds", description = "Get all the runners for a particular race with their current odds, identified by its time and place.")
+    public String getAllRunnersWithOdds(String time, String place) {
+        logger.info("AI tool call for all runners with odds in the {} at {}", time, place);
+        return Util.findAllRunnersWithOdds(time, place, gcsReader);
     }
 
     @Tool(name = "get_past_run_dates", description = "Get all the past race dates for a given horse name.")

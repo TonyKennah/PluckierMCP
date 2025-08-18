@@ -65,10 +65,28 @@ public class RacesInfoController {
         return racesInfo.getRaceWinPercentagesFromLastThree(time, place);
     }
 
+    @GetMapping("/race-win-percentages-from-last-one")
+    public String getRaceWinPercentagesFromLastOne(@RequestParam String time, @RequestParam String place) {
+        logger.info("REST request for race win percentages for last run in the {} at {}", time, place);
+        return racesInfo.getRaceWinPercentagesFromLastOne(time, place);
+    }
+
+    @GetMapping("/race-win-percentages-from-all")
+    public String getRaceWinPercentagesFromAll(@RequestParam String time, @RequestParam String place) {
+        logger.info("REST request for race win percentages for all past runs in the {} at {}", time, place);
+        return racesInfo.getRaceWinPercentagesFromAll(time, place);
+    }
+
     @GetMapping("/all-runners") //works
     public String getAllRunners(@RequestParam String time, @RequestParam String place) {
         logger.info("REST request for all runners in the {} at {}", time, place);
         return racesInfo.getAllRunners(time, place);
+    }
+
+    @GetMapping("/all-runners-with-odds") //works
+    public String getAllRunnersWithOdds(@RequestParam String time, @RequestParam String place) {
+        logger.info("REST request for all runners with odds in the {} at {}", time, place);
+        return racesInfo.getAllRunnersWithOdds(time, place);
     }
 
     @GetMapping("/all-times") //works
