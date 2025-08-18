@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import uk.co.kennah.mcp.gcp.GCSReader;
+import uk.co.kennah.mcp.gcp.GCSHorseReader;
 import uk.co.kennah.mcp.utils.Util;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ public class RacesInfo {
     private static final Logger logger = LoggerFactory.getLogger(RacesInfo.class);
 
     @Autowired
-    private GCSReader gcsReader;
+    private GCSHorseReader gcsReader;
 
     private JsonArray getCachedRaceData() {
         return Util.getCachedRaceData(gcsReader);

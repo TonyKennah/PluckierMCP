@@ -7,7 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.co.kennah.mcp.gcp.GCSReader;
+import uk.co.kennah.mcp.gcp.GCSHorseReader;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -24,7 +24,7 @@ class McpServerApplicationTests {
 	private MockMvc mockMvc;
 
 	@MockBean
-	private GCSReader gcsReader;
+	private GCSHorseReader gcsReader;
 
 	@Test
 	void getMeetingsEndpointShouldReturnMeetingList() throws Exception {

@@ -16,9 +16,9 @@ import com.google.cloud.storage.StorageException;
 import com.google.gson.*;
 
 @Component
-public class GCSReader {
+public class GCSHorseReader {
 
-    private static final Logger logger = LoggerFactory.getLogger(GCSReader.class);
+    private static final Logger logger = LoggerFactory.getLogger(GCSHorseReader.class);
     
     @Value("${gcs.bucket.name}")
     private String bucket;

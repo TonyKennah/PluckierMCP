@@ -19,13 +19,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import uk.co.kennah.mcp.gcp.GCSReader;
+import uk.co.kennah.mcp.gcp.GCSHorseReader;
 
 public class Util {
     // Local record for temporary data holding
     private record HorseAverageRating(String name, double average) {}
 
-    public static JsonArray getCachedRaceData(GCSReader gcsReader) {
+    public static JsonArray getCachedRaceData(GCSHorseReader gcsReader) {
         JsonElement jsonElement = gcsReader.readFileFromGCSAsJson();
         if (jsonElement == null || !jsonElement.isJsonArray()) {
             // This case will be handled by the calling methods if they receive null.
@@ -34,7 +34,7 @@ public class Util {
         return jsonElement.getAsJsonArray();
     }
 
-    public static Optional<JsonObject> findRace(String time, String place, GCSReader gcsReader) {
+    public static Optional<JsonObject> findRace(String time, String place, GCSHorseReader gcsReader) {
         JsonArray races = getCachedRaceData(gcsReader);
         if (races == null) {
             return Optional.empty();
@@ -63,7 +63,7 @@ public class Util {
         return stats.getCount() > 0 ? stats.getAverage() : -1;
     }
 
-    public static String findHorseByAverageRating(String time, String place, GCSReader gcsReader,
+    public static String findHorseByAverageRating(String time, String place, GCSHorseReader gcsReader,
             Optional<Integer> limit, boolean findMax, String description, String failureMessage) {
         return Util.findRace(time, place, gcsReader)
                 .map(race -> {
@@ -90,7 +90,7 @@ public class Util {
                 .orElse("Could not find the race at " + place + " at " + time);
     }
 
-    public static String findNap(GCSReader gcsReader, Predicate<JsonObject> raceFilter, String successMessage,
+    public static String findNap(GCSHorseReader gcsReader, Predicate<JsonObject> raceFilter, String successMessage,
             String failureMessage) {
         JsonArray races = getCachedRaceData(gcsReader);
         if (races == null) {
@@ -134,7 +134,7 @@ public class Util {
      * @param ratingStrategy A function that takes a horse JsonObject and returns an integer rating.
      * @return A formatted string with the win percentages, or an error message.
      */
-    private static String findRaceWinPercentages(String id, String time, String place, GCSReader gcsReader, Function<JsonObject, Integer> ratingStrategy) {
+    private static String findRaceWinPercentages(String id, String time, String place, GCSHorseReader gcsReader, Function<JsonObject, Integer> ratingStrategy) {
         // Local record for temporary data holding
         record HorseRating(String name, int rating) {}
 
@@ -162,23 +162,23 @@ public class Util {
                 .orElse("Could not find the race at " + place + " at " + time);
     }
 
-    public static String findRaceWinPercentagesFromLastOne(String time, String place, GCSReader gcsReader) {
+    public static String findRaceWinPercentagesFromLastOne(String time, String place, GCSHorseReader gcsReader) {
         return findRaceWinPercentages("latest run", time, place, gcsReader, horse -> (int) Util.getAverageFromLastPastRating(horse).orElse(0));
     }
 
-    public static String findRaceWinPercentagesFromLastThree(String time, String place, GCSReader gcsReader) {
+    public static String findRaceWinPercentagesFromLastThree(String time, String place, GCSHorseReader gcsReader) {
         return findRaceWinPercentages("last 3 runs", time, place, gcsReader, horse -> (int) Util.getAverageFromThreePastRating(horse).orElse(0));
     }
 
-    public static String findRaceWinPercentagesFromBestEver(String time, String place, GCSReader gcsReader) {
+    public static String findRaceWinPercentagesFromBestEver(String time, String place, GCSHorseReader gcsReader) {
         return findRaceWinPercentages("best run", time, place, gcsReader, horse -> Util.getMaxRating(horse).orElse(0));
     }
 
-    public static String findRaceWinPercentagesFromAll(String time, String place, GCSReader gcsReader) {
+    public static String findRaceWinPercentagesFromAll(String time, String place, GCSHorseReader gcsReader) {
         return findRaceWinPercentages("all runs", time, place, gcsReader, horse -> (int) Util.getAverageFromAllPastRating(horse).orElse(0));
     }
 
-    public static String findBestMostRecentRatedHorse(String time, String place, GCSReader gcsReader) {
+    public static String findBestMostRecentRatedHorse(String time, String place, GCSHorseReader gcsReader) {
         // Local record for temporary data holding
         record HorseRecentRating(String name, int rating) {}
         return Util.findRace(time, place, gcsReader)
@@ -201,7 +201,7 @@ public class Util {
     }
 
 
-    public static String findBestEverRatedHorse(String time, String place, GCSReader gcsReader) {
+    public static String findBestEverRatedHorse(String time, String place, GCSHorseReader gcsReader) {
         // Local record for temporary data holding
         record HorseRating(String name, int rating) {}
 
@@ -357,7 +357,7 @@ public class Util {
                 .collect(Collectors.joining(", "));
     }
 
-    public static String findAllRunners(String time, String place, GCSReader gcsReader) {
+    public static String findAllRunners(String time, String place, GCSHorseReader gcsReader) {
         return Util.findRace(time, place, gcsReader)
                 .map(race -> {
                     String runners = Util.getRunners(race);
@@ -367,7 +367,7 @@ public class Util {
                 .orElse("Could not find the race at " + place + " at " + time);
     }
 
-    public static String findAllRunnersWithOdds(String time, String place, GCSReader gcsReader) {
+    public static String findAllRunnersWithOdds(String time, String place, GCSHorseReader gcsReader) {
         return Util.findRace(time, place, gcsReader)
                 .map(race -> {
                     String runnersWithOdds = Util.getRunnersWithOdds(race);
