@@ -47,9 +47,9 @@ public class Util {
     public static Set<String> getOdds(JsonArray odds, String time, String place) {
         return StreamSupport.stream(odds.spliterator(), false)
                 .map(JsonElement::getAsJsonObject)
-                .filter(det -> det.get("event").getAsString().contains(time) && det.get("event").getAsString().contains(place))
-                .map(det -> det.get("name").getAsString() + " " + det.get("odds").getAsString())
-                .collect(Collectors.toSet());  
+                .filter(det -> det.get("event").getAsString().contains(time) && det.get("event").getAsString().toLowerCase().contains(place.toLowerCase()))
+                .map(det -> det.get("name").getAsString() + " " + (det.has("odds") ? det.get("odds").getAsString() : "NR"))
+                .collect(Collectors.toSet());
     }
         
 
