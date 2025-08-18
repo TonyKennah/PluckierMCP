@@ -87,8 +87,10 @@ The application provides a real-time log viewer to monitor server activity. This
 
 Examples:
 
+Ex 1:
 <img width="1642" height="420" alt="image" src="https://github.com/user-attachments/assets/e2e88efc-2648-46eb-b702-1b51e03b0f69" />
 
+Ex 2:
 <img width="1203" height="340" alt="image" src="https://github.com/user-attachments/assets/555aab96-ba9e-4b0a-8ca7-d764909a09e1" />
 
 
