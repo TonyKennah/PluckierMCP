@@ -23,7 +23,7 @@ public class RacesInfoController {
         return racesInfo.getMeetings();
     }
 
-    @GetMapping("/odds") //works
+    @GetMapping("/get-odds") //works
     public String getOdds(@RequestParam String time, @RequestParam String place) {
         logger.info("REST request received for all the odds");
         return racesInfo.getOdds(time, place);
