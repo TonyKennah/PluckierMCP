@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.IntSummaryStatistics;
 import java.util.Optional;
 import java.util.OptionalDouble;
@@ -20,7 +21,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import uk.co.kennah.mcp.gcp.GCSHorseReader;
-import uk.co.kennah.mcp.gcp.GCSOddsReader;
 
 public class Util {
     // Local record for temporary data holding
@@ -35,23 +35,38 @@ public class Util {
         return jsonElement.getAsJsonArray();
     }
 
-    public static JsonArray getCachedOddsData(GCSOddsReader gcsReader) {
-        JsonElement jsonElement = gcsReader.readOddsFileFromGCSAsJson();
-        if (jsonElement == null || !jsonElement.isJsonArray()) {
-            // This case will be handled by the calling methods if they receive null.
-            return null;
-        }
-        return jsonElement.getAsJsonArray();
-    }
-
-    public static Set<String> getOdds(JsonArray odds, String time, String place) {
-        return StreamSupport.stream(odds.spliterator(), false)
-                .map(JsonElement::getAsJsonObject)
-                .filter(det -> det.get("event").getAsString().contains(time) && det.get("event").getAsString().toLowerCase().contains(place.toLowerCase()))
-                .map(det -> det.get("name").getAsString() + " " + (det.has("odds") ? det.get("odds").getAsString() : "NR"))
-                .collect(Collectors.toSet());
+    public static String getOdds(String time, String place, GCSHorseReader gcsReader) {
+        return Util.findRace(time, place, gcsReader)
+                .map(race -> {
+                    String odds = getOddsForRace(race);
+                    if (odds.isEmpty()) {
+                        return "No runners found for the race at " + place + " at " + time;
+                    }
+                    if (Stream.of(odds.split(", ")).allMatch(o -> o.endsWith(": N/A"))) {
+                        return "We don't have odds for the race at " + place + " at " + time;
+                    }
+                    return "Odds for the " + time + " at " + place + ": " + odds;
+                })
+                .orElse("Could not find the race at " + place + " at " + time);
     }
         
+    private static String getOddsForRace(JsonObject race) {
+        if (!race.has("horses") || !race.get("horses").isJsonArray()) {
+            return "";
+        }
+        return StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
+                .map(JsonElement::getAsJsonObject)
+                .filter(horse -> horse.has("name"))
+                .map(horse -> {
+                    String name = horse.get("name").getAsString();
+                    JsonElement oddsElement = horse.get("odds");
+                    // If odds are null, it means they are not available (N/A).
+                    // A confirmed Non-Runner would have "NR" as a string value.
+                    String oddsValue = !oddsElement.isJsonNull() ? oddsElement.getAsString() : "N/A";
+                    return name + ": " + oddsValue;
+                })
+                .collect(Collectors.joining(", "));
+    }
 
     public static Optional<JsonObject> findRace(String time, String place, GCSHorseReader gcsReader) {
         JsonArray races = getCachedRaceData(gcsReader);
