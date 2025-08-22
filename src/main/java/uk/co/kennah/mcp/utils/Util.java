@@ -104,6 +104,7 @@ public class Util {
                     Stream<HorseAverageRating> ratingsStream = StreamSupport
                             .stream(race.getAsJsonArray("horses").spliterator(), false)
                             .map(JsonElement::getAsJsonObject)
+                            .filter(Util::isRunner)
                             .map(horse -> new HorseAverageRating(
                                     horse.get("name").getAsString(),
                                     calculateAverageRating(horse, limit)))
@@ -144,6 +145,7 @@ public class Util {
                     String place = race.get("place").getAsString();
                     return StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                             .map(JsonElement::getAsJsonObject)
+                            .filter(Util::isRunner)
                             .map(horse -> {
                                 double average = Util.calculateAverageRating(horse, Optional.of(3));
                                 return new NapCandidate(horse.get("name").getAsString(), time, place, average);
@@ -176,6 +178,7 @@ public class Util {
                 .map(race -> {
                     java.util.List<HorseRating> horseRatings = StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                         .map(JsonElement::getAsJsonObject)
+                        .filter(Util::isRunner)
                         .map(horse -> {
                             String horseName = horse.get("name").getAsString();
                             if (!horse.has("past") || !horse.get("past").isJsonArray()) {
@@ -218,6 +221,7 @@ public class Util {
         return Util.findRace(time, place, gcsReader)
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                         .map(JsonElement::getAsJsonObject)
+                        .filter(Util::isRunner)
                         .map(horse -> {
                             if (!horse.has("past") || !horse.get("past").isJsonArray()) {
                                 return Optional.<HorseRecentRating>empty();
@@ -242,6 +246,7 @@ public class Util {
         return Util.findRace(time, place, gcsReader)
                 .map(race -> StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
                         .map(JsonElement::getAsJsonObject)
+                        .filter(Util::isRunner)
                         .filter(horse -> horse.has("past") && horse.get("past").isJsonArray())
                         .flatMap(horse -> StreamSupport.stream(horse.getAsJsonArray("past").spliterator(), false)
                                 .map(JsonElement::getAsJsonObject)
@@ -251,6 +256,18 @@ public class Util {
                         .map(top -> "Top Rated for the " + time + " at " + place + " is: " + top.name() + " with a rating of " + top.rating())
                         .orElse("No rated horses found for the race at " + place + " at " + time))
                 .orElse("Could not find the race at " + place + " at " + time);
+    }
+
+    private static boolean isRunner(JsonObject horse) {
+        // A horse is a non-runner only if its odds are explicitly "NR".
+        if (horse.has("odds")) {
+            JsonElement oddsElement = horse.get("odds");
+            if (!oddsElement.isJsonNull() && oddsElement.isJsonPrimitive()) {
+                return !"NR".equalsIgnoreCase(oddsElement.getAsString());
+            }
+        }
+        // If odds are missing, null, or not a primitive string, assume it's a runner.
+        return true;
     }
 
     public static String getFormDetails(JsonObject horse) {
