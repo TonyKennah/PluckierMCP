@@ -30,6 +30,56 @@
             padding: 5px;
             border-radius: 3px;
         }
+        /* Styles for the result overlay */
+        #result-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            z-index: 1000;
+            display: flex; /* Use flexbox for centering */
+            justify-content: center;
+            align-items: center;
+        }
+        .overlay-content {
+            position: relative;
+            background-color: #252526;
+            border: 1px solid #3c3c3c;
+            border-radius: 8px;
+            width: 85%;
+            height: 85%;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+        }
+        #close-overlay-btn {
+            position: absolute;
+            top: 5px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #d4d4d4;
+            font-size: 2.5em;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+            z-index: 1001;
+        }
+        #close-overlay-btn:hover {
+            color: #fff;
+        }
+        #result-iframe {
+            flex-grow: 1;
+            border: 1px solid #3c3c3c;
+            width: 100%;
+            height: 100%;
+            margin-top: 35px; /* Space for close button */
+            background-color: #1e1e1e;
+        }
     </style>
 </head>
 <body>
@@ -43,11 +93,11 @@
 
         <h3>Static API Endpoints</h3>
         <ul>
-            <li><a href="/nap-of-the-day" target="_blank">/nap-of-the-day</a></li>
-            <li><a href="/nap-of-the-day-handicap" target="_blank">/nap-of-the-day-handicap</a></li>
-            <li><a href="/nap-of-the-day-uk-handicap" target="_blank">/nap-of-the-day-uk-handicap</a></li>
-            <li><a href="/next-race" target="_blank">/next-race</a></li>
-            <li><a href="/meetings" target="_blank">/meetings</a></li>
+            <li><a href="/nap-of-the-day">/nap-of-the-day</a></li>
+            <li><a href="/nap-of-the-day-handicap">/nap-of-the-day-handicap</a></li>
+            <li><a href="/nap-of-the-day-uk-handicap">/nap-of-the-day-uk-handicap</a></li>
+            <li><a href="/next-race">/next-race</a></li>
+            <li><a href="/meetings">/meetings</a></li>
         </ul>
 
         <h3>Interactive API Endpoints</h3>
@@ -69,34 +119,41 @@
 
         <h4>By Place</h4>
         <ul>
-            <li><a href="#" id="allTimesLink" target="_blank">/all-times</a></li>
+            <li><a href="#" id="allTimesLink">/all-times</a></li>
         </ul>
 
         <h4>By Time & Place</h4>
         <ul>
-            <li><a href="#" id="topRatedLink" target="_blank">/top-rated</a></li>
-            <li><a href="#" id="bottomRatedLink" target="_blank">/bottom-rated</a></li>
-            <li><a href="#" id="bestAverageRatedLink" target="_blank">/best-average-rated</a></li>
-            <li><a href="#" id="bestEverRatedLink" target="_blank">/best-ever-rated</a></li>
-            <li><a href="#" id="bestMostRecentRatedLink" target="_blank">/best-most-recent-rated</a></li>
-            <li><a href="#" id="raceWinPercentagesLastThreeLink" target="_blank">/race-win-percentages-from-last-three</a></li>
-            <li><a href="#" id="raceWinPercentageBestEverLink" target="_blank">/race-win-percentages-from-best-ever</a></li>
-            <li><a href="#" id="raceWinPercentagesLastOneLink" target="_blank">/race-win-percentages-from-last-one</a></li>
-            <li><a href="#" id="raceWinPercentageAllLink" target="_blank">/race-win-percentages-from-all</a></li>
-            <li><a href="#" id="allRunnersLink" target="_blank">/all-runners</a></li>
-            <li><a href="#" id="allRunnersWithOddsLink" target="_blank">/get-odds</a></li>
+            <li><a href="#" id="topRatedLink">/top-rated</a></li>
+            <li><a href="#" id="bottomRatedLink">/bottom-rated</a></li>
+            <li><a href="#" id="bestAverageRatedLink">/best-average-rated</a></li>
+            <li><a href="#" id="bestEverRatedLink">/best-ever-rated</a></li>
+            <li><a href="#" id="bestMostRecentRatedLink">/best-most-recent-rated</a></li>
+            <li><a href="#" id="raceWinPercentagesLastThreeLink">/race-win-percentages-from-last-three</a></li>
+            <li><a href="#" id="raceWinPercentageBestEverLink">/race-win-percentages-from-best-ever</a></li>
+            <li><a href="#" id="raceWinPercentagesLastOneLink">/race-win-percentages-from-last-one</a></li>
+            <li><a href="#" id="raceWinPercentageAllLink">/race-win-percentages-from-all</a></li>
+            <li><a href="#" id="allRunnersLink">/all-runners</a></li>
+            <li><a href="#" id="allRunnersWithOddsLink">/get-odds</a></li>
         </ul>
 
         <h4>By Horse Name</h4>
         <ul>
-            <li><a href="#" id="pastRunDatesLink" target="_blank">/past-run-dates</a></li>
-            <li><a href="#" id="findHorseRaceLink" target="_blank">/find-horse-race</a></li>
+            <li><a href="#" id="pastRunDatesLink">/past-run-dates</a></li>
+            <li><a href="#" id="findHorseRaceLink">/find-horse-race</a></li>
         </ul>
 
         <h4>By Time, Place & Horse Name</h4>
         <ul>
-            <li><a href="#" id="horseFormLink" target="_blank">/horse-form</a></li>
+            <li><a href="#" id="horseFormLink">/horse-form</a></li>
         </ul>
+
+        <div id="result-overlay" style="display: none;">
+            <div class="overlay-content">
+                <button id="close-overlay-btn" title="Close (Esc)">&times;</button>
+                <iframe id="result-iframe" name="result-frame"></iframe>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -104,14 +161,94 @@
             const placeInput = document.getElementById('placeInput');
             const timeInput = document.getElementById('timeInput');
             const horseNameInput = document.getElementById('horseNameInput');
+            const resultOverlay = document.getElementById('result-overlay');
+            const resultIframe = document.getElementById('result-iframe');
+
+            resultIframe.addEventListener('load', function() {
+                // Don't try to style the initial blank page.
+                if (this.src === 'about:blank' || !this.contentDocument) {
+                    return;
+                }
+
+                try {
+                    const doc = this.contentDocument;
+                                        const body = doc.body;
+                    
+                    // The browser might wrap plain text in a <pre> tag.
+                    const originalText = ((body.querySelector('pre') || body).textContent || '').trim();
+
+                    // Check if the text seems to be in the "Title: item, item, item" format.
+                    // This regex splits the string at the first ": " into a title and the rest.
+                    const parts = originalText.split(/: (.+)/);
+
+                    const style = doc.createElement('style');
+
+                    if (parts.length >= 3 && parts[1].includes(',')) { // Regex gives 3 parts. Check if list has commas.
+                        const title = parts[0].trim() + ':';
+                        const listStr = parts[1];
+                        const listItems = listStr.split(',').map(item => item.trim());
+
+                        // Create new HTML content with a heading and a list
+                        let newHtml = `<h1>${title}</h1><ul>`;
+                        listItems.forEach(item => {
+                            if (item) { newHtml += `<li>${item}</li>`; }
+                        });
+                        newHtml += '</ul>';
+                        body.innerHTML = newHtml;
+
+                        // CSS for the formatted list view
+                        style.textContent = `
+                            body {
+                                background-color: #1e1e1e; color: #d4d4d4;
+                                font-family: 'Courier New', Courier, monospace;
+                                font-size: 1.5em; /* Keep it big as requested */
+                                padding: 1em; margin: 0;
+                            }
+                            h1 {
+                                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                                color: #4ec9b0; border-bottom: 1px solid #444;
+                                padding-bottom: 10px; margin-top: 0; margin-bottom: 1em;
+                                font-size: 1em; /* Same size as list items, but different style */
+                                font-weight: normal;
+                            }
+                            ul { list-style-type: none; padding: 0; margin: 0; }
+                            li {
+                                background-color: #252526; border: 1px solid #3c3c3c;
+                                padding: 10px; margin-bottom: 8px; border-radius: 4px;
+                            }
+                        `;
+                    } else {
+                        // Original CSS for plain text content
+                        style.textContent = `
+                            body {
+                                background-color: #1e1e1e; color: #d4d4d4;
+                                font-family: 'Courier New', Courier, monospace;
+                                font-size: 2em; padding: 1em; margin: 0;
+                                white-space: pre-wrap; word-wrap: break-word;
+                            }
+                        `;
+                    }
+                    doc.head.appendChild(style);
+                } catch (e) {
+                    // This can happen due to cross-origin restrictions, but shouldn't for same-origin content.
+                    console.error('Failed to style iframe content:', e);
+                }
+            });
+
+            const closeOverlayBtn = document.getElementById('close-overlay-btn');
+            // Select all links within the container except the one for logs.html,
+            // so they open in the iframe.
+            const interactiveLinks = Array.from(document.querySelectorAll('#container a:not([href="/logs.html"])'));
 
             function updateLinks() {
                 const place = encodeURIComponent(placeInput.value);
                 const time = encodeURIComponent(timeInput.value);
                 const horseName = encodeURIComponent(horseNameInput.value);
 
+                // By Place
                 document.getElementById('allTimesLink').href = `/all-times?place=${place}`;
                 
+                // By Time & Place
                 const timeAndPlaceParams = `?time=${time}&place=${place}`;
                 document.getElementById('topRatedLink').href = '/top-rated' + timeAndPlaceParams;
                 document.getElementById('bottomRatedLink').href = '/bottom-rated' + timeAndPlaceParams;
@@ -124,16 +261,56 @@
                 document.getElementById('raceWinPercentageAllLink').href = '/race-win-percentages-from-all' + timeAndPlaceParams;
                 document.getElementById('allRunnersLink').href = '/all-runners' + timeAndPlaceParams;
                 document.getElementById('allRunnersWithOddsLink').href = '/get-odds' + timeAndPlaceParams;
+
+                // By Horse Name
                 document.getElementById('pastRunDatesLink').href = `/past-run-dates?horseName=${horseName}`;
                 document.getElementById('findHorseRaceLink').href = `/find-horse-race?horseName=${horseName}`;
+
+                // By Time, Place & Horse Name
                 document.getElementById('horseFormLink').href = `/horse-form?time=${time}&place=${place}&horseName=${horseName}`;
             }
+
+            function showResult(event) {
+                event.preventDefault();
+                const url = event.currentTarget.href;
+                if (url && !url.endsWith('#')) {
+                    resultIframe.src = url;
+                    resultOverlay.style.display = 'flex';
+                }
+            }
+
+            function hideResult() {
+                resultIframe.src = 'about:blank'; // Prevent content from lingering and stop any audio/video
+                resultOverlay.style.display = 'none';
+            }
+
+            // --- Event Listeners ---
 
             placeInput.addEventListener('input', updateLinks);
             timeInput.addEventListener('input', updateLinks);
             horseNameInput.addEventListener('input', updateLinks);
 
-            updateLinks();
+            interactiveLinks.forEach(link => {
+                link.addEventListener('click', showResult);
+            });
+
+            closeOverlayBtn.addEventListener('click', hideResult);
+
+            // Close overlay by clicking on the background
+            resultOverlay.addEventListener('click', function(event) {
+                if (event.target === resultOverlay) {
+                    hideResult();
+                }
+            });
+
+            // Close overlay with Escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && resultOverlay.style.display !== 'none') {
+                    hideResult();
+                }
+            });
+
+            updateLinks(); // Initial call to set up hrefs
         })();
     </script>
 </body>

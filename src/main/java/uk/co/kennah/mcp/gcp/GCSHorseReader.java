@@ -58,7 +58,7 @@ public class GCSHorseReader {
     }
 
     private JsonElement readOddsFileFromGCSAsJson() {
-        logger.info("Reading all of today's horse racing data to cache.");
+        logger.info("Updating horse racing data with latest odds.");
         try {
             BlobId blobId = BlobId.of(bucket, oddsFile);
             Blob blob = storage.get(blobId);
@@ -113,19 +113,11 @@ public class GCSHorseReader {
                                     String horseName = horseObject.get("name").getAsString();
                                     // Find the odds for this horse and add it to the horse object
                                     if (oddsMap.containsKey(horseName)) {
-                                        logger.info("found horse name directly: " + horseName);
-                                        logger.info(horseObject.get("odds") +" old odds : new odds " + oddsMap.get(horseName));
                                         horseObject.add("odds", oddsMap.get(horseName));
                                     } else if (oddsMap.containsKey(horseName.replace("'", ""))) {
                                         horseObject.add("odds", oddsMap.get(horseName.replace("'", "")));
-                                        logger.info("found horse name replacing apostrophe: " + horseName);
-                                        logger.info(horseObject.get("odds") +" old odds : new odds " + oddsMap.get(horseName.replace("'", "")));
                                     } else if (oddsMap.containsKey(horseName.toUpperCase())) {
                                         horseObject.add("odds", oddsMap.get(horseName.toUpperCase()));
-                                        logger.info("found horse name uppercased: " + horseName);
-                                        logger.info(horseObject.get("odds") +" old odds : new odds " + oddsMap.get(horseName.toUpperCase()));
-                                    } else {
-                                        logger.info("No odds to update for: " + horseName);
                                     }
                                 }
                             }
