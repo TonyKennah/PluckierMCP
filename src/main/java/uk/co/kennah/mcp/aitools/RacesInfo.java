@@ -26,6 +26,15 @@ public class RacesInfo {
         return Util.getCachedRaceData(gcsReader);
     }
 
+    private Optional<JsonArray> getRaces() {
+        JsonArray races = getCachedRaceData();
+        if (races == null) {
+            logger.warn("Race data is not available or in the expected format.");
+            return Optional.empty();
+        }
+        return Optional.of(races);
+    }
+
     @Tool(name = "get_odds", description = "Retrieve horses and odds for a race.")
     public String getOdds(String time, String place) {
         logger.info("AI tool call for all odds");
@@ -134,13 +143,28 @@ public class RacesInfo {
         return Util.findAllRunners(time, place, gcsReader);
     }
 
+    @Tool(name = "get_non_runners", description = "Get a list of all non-runners for today's races.")
+    public String getNonRunners() {
+        logger.info("AI tool call for all non-runners for the day");
+        Optional<JsonArray> racesOptional = getRaces();
+        if (racesOptional.isEmpty()) {
+            return "Error: Race data is not available or in the expected format.";
+        }
+        String nonRunnersList = Util.getNonRunners(racesOptional.get());
+        if (nonRunnersList.isEmpty()) {
+            return "There are no non-runners for today's races.";
+        }
+        return "Today's non-runners are: " + nonRunnersList;
+    }
+
     @Tool(name = "get_past_run_dates", description = "Get all the past race dates for a given horse name.")
     public String getPastRunDates(String horseName) {
         logger.info("AI tool call for past run dates for horse: {}", horseName);
-        JsonArray races = getCachedRaceData();
-        if (races == null) {
+        Optional<JsonArray> racesOptional = getRaces();
+        if (racesOptional.isEmpty()) {
             return "Error: Race data is not available or in the expected format.";
         }
+        JsonArray races = racesOptional.get();
         // Find the first occurrence of the horse, as its past data should be consistent.
         Optional<JsonObject> horseOptional = Util.getHorseOptional(races, horseName);
         if (horseOptional.isEmpty()) {
@@ -156,9 +180,11 @@ public class RacesInfo {
     @Tool(name = "get_all_times", description = "Get all the race times for a given meeting place.")
     public String getAllTimes(String place) {
         logger.info("AI tool call for all race times at {}", place);
-        JsonArray races = getCachedRaceData();
-        if (races == null) return "Error: Race data is not in the expected format.";
-        String times = Util.getTimes(races, place);
+        Optional<JsonArray> racesOptional = getRaces();
+        if (racesOptional.isEmpty()) {
+            return "Error: Race data is not in the expected format.";
+        }
+        String times = Util.getTimes(racesOptional.get(), place);
         return times.isEmpty()
                 ? "No race times found for meeting at " + place
                 : "Race times for " + place + ": " + times;
@@ -168,9 +194,11 @@ public class RacesInfo {
     public String getMeetings() {
         logger.info("AI tool call for all meeting places");
         try {
-            JsonArray races = getCachedRaceData();
-            if (races == null) return "Error: Race data is not in the expected format.";
-            Set<String> meetings = Util.getMeetings(races);
+            Optional<JsonArray> racesOptional = getRaces();
+            if (racesOptional.isEmpty()) {
+                return "Error: Race data is not in the expected format.";
+            }
+            Set<String> meetings = Util.getMeetings(racesOptional.get());
             if (meetings.isEmpty()) {
                 return "No meetings found in the data.";
             }
@@ -183,11 +211,11 @@ public class RacesInfo {
     @Tool(name = "find_horse_race", description = "Finds the race time and meeting for a given horse name.")
     public String findHorseRace(String horseName) {
         logger.info("AI tool call to find race for horse: {}", horseName);
-        JsonArray races = getCachedRaceData();
-        if (races == null) {
+        Optional<JsonArray> racesOptional = getRaces();
+        if (racesOptional.isEmpty()) {
             return "Error: Race data is not available or in the expected format.";
         }
-        String result = Util.getResult(races, horseName);
+        String result = Util.getResult(racesOptional.get(), horseName);
         if (result.isEmpty()) {
             return "Could not find any races for horse: " + horseName;
         }
@@ -197,11 +225,11 @@ public class RacesInfo {
     @Tool(name = "get_next_race", description = "Reports the next race time and meeting based on the current system time.")
     public String getNextRace() {
         logger.info("AI tool call for the next race");
-        JsonArray races = getCachedRaceData();
-        if (races == null) {
+        Optional<JsonArray> racesOptional = getRaces();
+        if (racesOptional.isEmpty()) {
             return "Error: Race data is not available or in the expected format.";
         }
-        Optional<JsonObject> nextRaceOptional = Util.getRaceOptional(races);
+        Optional<JsonObject> nextRaceOptional = Util.getRaceOptional(racesOptional.get());
         return nextRaceOptional
                 .map(race -> "The next race is at " + race.get("time").getAsString() + " at " + race.get("place").getAsString() + ".")
                 .orElse("There are no more races scheduled for today.");

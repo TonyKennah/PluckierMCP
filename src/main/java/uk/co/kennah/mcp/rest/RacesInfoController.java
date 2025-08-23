@@ -29,6 +29,12 @@ public class RacesInfoController {
         return racesInfo.getOdds(time, place);
     }
 
+    @GetMapping("/get-non-runners") //works
+    public String getNonRunners() {
+        logger.info("REST request received for all the NRs for today");
+        return racesInfo.getNonRunners();
+    }
+
     @GetMapping("/top-rated")
     public String getTopRated(@RequestParam String time, @RequestParam String place) {
         logger.info("REST request for top rated horse in the {} at {}", time, place);

@@ -199,6 +199,21 @@ public class Util {
                 .orElse("Could not find the race at " + place + " at " + time);
     }
 
+    public static String getNonRunners(JsonArray races) {
+        return StreamSupport.stream(races.spliterator(), false)
+                .map(JsonElement::getAsJsonObject)
+                .filter(race -> race.has("time") && race.has("place") && race.has("horses") && race.get("horses").isJsonArray())
+                .flatMap(race -> {
+                    String time = race.get("time").getAsString();
+                    String place = race.get("place").getAsString();
+                    return StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
+                            .map(JsonElement::getAsJsonObject)
+                            .filter(horse -> horse.has("odds") && !horse.get("odds").isJsonNull() && horse.get("odds").isJsonPrimitive() && "NR".equalsIgnoreCase(horse.get("odds").getAsString()))
+                            .map(horse -> String.format("%s at %s: %s", time, place, horse.get("name").getAsString()));
+                })
+                .collect(Collectors.joining(", "));
+    }
+
     public static String findRaceWinPercentagesFromLastOne(String time, String place, GCSHorseReader gcsReader) {
         return findRaceWinPercentages("latest run", time, place, gcsReader, horse -> (int) Util.getAverageFromLastPastRating(horse).orElse(0));
     }
