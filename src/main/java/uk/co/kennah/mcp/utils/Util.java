@@ -292,8 +292,8 @@ public class Util {
                 .sorted(Comparator
                         .comparing((JsonObject form) -> LocalDate.parse(form.get("date").getAsString(), DateTimeFormatter.ofPattern("dd/MM/yyyy")))
                         .reversed())
-                .map(form -> "Date: " + form.get("date").getAsString() + ", Rating: " + form.get("name").getAsInt())
-                .collect(Collectors.joining("; "));
+                .map(form -> "Date: " + form.get("date").getAsString() + " Rating: " + form.get("name").getAsInt())
+                .collect(Collectors.joining(", "));
     }
 
     public static String getTimes(JsonArray races, String place) {
@@ -370,9 +370,14 @@ public class Util {
     }
 
     public static String getRunners(JsonObject race){
+        if (!race.has("horses") || !race.get("horses").isJsonArray()) {
+            return "";
+        }
         return StreamSupport.stream(race.getAsJsonArray("horses").spliterator(), false)
-                            .map(horse -> horse.getAsJsonObject().get("name").getAsString())
-                            .collect(Collectors.joining(", "));
+                .map(JsonElement::getAsJsonObject)
+                .filter(Util::isRunner)
+                .map(horse -> horse.get("name").getAsString())
+                .collect(Collectors.joining(", "));
     }
 
     public static Set<String> getMeetings(JsonArray races){
