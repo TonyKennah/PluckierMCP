@@ -94,3 +94,8 @@ Ex 2:
 <img width="1203" height="340" alt="image" src="https://github.com/user-attachments/assets/555aab96-ba9e-4b0a-8ca7-d764909a09e1" />
 
 
+# Code Quality
+
+<img width="857" height="415" alt="image" src="https://github.com/user-attachments/assets/28e788b6-4868-436a-af42-45744eff0c3e" />
+
+
